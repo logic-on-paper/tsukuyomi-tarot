@@ -242,10 +242,10 @@ footer { text-align: center; font-size: 0.75rem; color: var(--muted); }
 "use strict";
 
 /* ===== 設定：自作のカード画像を使う場合 =====
-   cards フォルダに 00.png〜21.png（縦長、比率 7:12 前後）を置き、
+   cards フォルダに 00.jpg〜21.jpg（縦長、比率 7:12 前後）を置き、
    下の CARD_IMAGES を true に変えると、内蔵の図柄の代わりに画像を表示します。 */
-const CARD_IMAGES = false;
-const cardImagePath = i => `cards/${String(i).padStart(2, "0")}.png`;
+const CARD_IMAGES = true;
+const cardImagePath = i => `cards/${String(i).padStart(2, "0")}.jpg`;
 
 /* ===== 大アルカナ22枚 ===== */
 const CARDS = [

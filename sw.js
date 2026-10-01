@@ -1,7 +1,7 @@
 /* 月読 Service Worker
    ファイルを端末に保存し、通信がなくてもアプリを起動できるようにします。
    アプリを更新したら VERSION の数字を上げてください（例: "v2"）。古い保存分が消えます。 */
-const VERSION = "v2";
+const VERSION = "v3";
 const PREFIX = "tsukiakari-tarot-";
 const CACHE = PREFIX + VERSION;
 
@@ -12,7 +12,29 @@ const CORE = [
   "manifest.json",
   "icons/icon-180.png",
   "icons/icon-192.png",
-  "icons/icon-512.png"
+  "icons/icon-512.png",
+  "cards/00.jpg",
+  "cards/01.jpg",
+  "cards/02.jpg",
+  "cards/03.jpg",
+  "cards/04.jpg",
+  "cards/05.jpg",
+  "cards/06.jpg",
+  "cards/07.jpg",
+  "cards/08.jpg",
+  "cards/09.jpg",
+  "cards/10.jpg",
+  "cards/11.jpg",
+  "cards/12.jpg",
+  "cards/13.jpg",
+  "cards/14.jpg",
+  "cards/15.jpg",
+  "cards/16.jpg",
+  "cards/17.jpg",
+  "cards/18.jpg",
+  "cards/19.jpg",
+  "cards/20.jpg",
+  "cards/21.jpg"
 ];
 
 // インストール時：必要なファイルをまとめて保存する
