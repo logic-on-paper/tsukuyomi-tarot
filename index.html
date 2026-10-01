@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="description" content="大アルカナ22枚で占う、1枚引きと3枚引きのタロット占い">
+<meta name="description" content="78枚のタロットで占う、1枚引きと3枚引きのタロット占い">
 <meta name="theme-color" content="#191022">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -83,12 +83,17 @@ h1 { margin: 0; font-family: var(--font-display); font-weight: 600; font-size: 2
 
 /* 設定 */
 .setup { display: flex; flex-direction: column; gap: 14px; }
-.seg { display: grid; grid-template-columns: 1fr 1fr; border: 1px solid var(--gilt-deep); border-radius: 999px; padding: 3px; position: relative; }
+.seg { display: grid; grid-template-columns: repeat(3, 1fr); border: 1px solid var(--gilt-deep); border-radius: 999px; padding: 3px; position: relative; }
 .seg input { position: absolute; opacity: 0; pointer-events: none; }
 .seg label { text-align: center; padding: 7px 12px; border-radius: 999px; cursor: pointer; color: var(--muted); font-size: 0.95rem; }
 .seg input:checked + label { background: var(--gilt); color: var(--cloth-deep); font-weight: 600; }
 .seg input:focus-visible + label { outline: 2px solid var(--ink); outline-offset: 2px; }
 .field { display: flex; flex-direction: column; gap: 4px; }
+.cats { display: flex; flex-wrap: wrap; gap: 8px; }
+.cat input { position: absolute; opacity: 0; pointer-events: none; }
+.cat label { display: inline-block; padding: 5px 14px; border: 1px solid var(--gilt-deep); border-radius: 999px; font-size: 0.85rem; color: var(--muted); cursor: pointer; letter-spacing: 0.04em; }
+.cat input:checked + label { background: var(--gilt); border-color: var(--gilt); color: var(--cloth-deep); font-weight: 600; }
+.cat input:focus-visible + label { outline: 2px solid var(--ink); outline-offset: 2px; }
 .field label { font-size: 0.8rem; color: var(--muted); letter-spacing: 0.04em; }
 .field input {
   font: inherit; font-size: 1rem; color: var(--ink); background: transparent;
@@ -96,6 +101,7 @@ h1 { margin: 0; font-family: var(--font-display); font-weight: 600; font-size: 2
 }
 .field input::placeholder { color: var(--card-ink-soft); }
 .field input:focus-visible { outline: none; border-bottom-color: var(--gilt); }
+.checks { display: flex; flex-wrap: wrap; gap: 6px 22px; }
 .check { display: flex; align-items: center; gap: 8px; font-size: 0.9rem; color: var(--muted); cursor: pointer; }
 .check input { width: 18px; height: 18px; accent-color: var(--gilt); }
 
@@ -137,6 +143,11 @@ h1 { margin: 0; font-family: var(--font-display); font-weight: 600; font-size: 2
 .face { transform: rotateY(180deg); }
 .card.is-rev .face { transform: rotateY(180deg) rotateZ(180deg); }
 .hint { margin: 0; color: var(--muted); font-size: 0.9rem; text-align: center; }
+.streak { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.moons { display: flex; gap: 10px; }
+.moons i { width: 16px; height: 16px; border-radius: 50%; border: 1px solid var(--gilt-deep); background: transparent; transition: background 0.6s, box-shadow 0.6s; }
+.moons i.on { background: var(--gilt); border-color: var(--gilt); box-shadow: 0 0 10px var(--gilt-glow); }
+.streak-text { margin: 0; font-size: 0.8rem; letter-spacing: 0.08em; color: var(--muted); }
 
 /* カードの絵 */
 .paper { fill: var(--paper); }
@@ -189,12 +200,22 @@ h1 { margin: 0; font-family: var(--font-display); font-weight: 600; font-size: 2
   background: var(--cloth-deep); border: 1px solid var(--rule); border-radius: 4px; padding: 10px;
 }
 
+/* 今日のひとこと */
+.today { text-align: center; display: flex; flex-direction: column; gap: 6px; padding: 18px 16px 16px; border-top: 1px solid var(--gilt-deep); border-bottom: 1px solid var(--gilt-deep); animation: rise 0.6s ease backwards; }
+.today-label { margin: 0; font-family: var(--font-display); font-size: 0.78rem; letter-spacing: 0.3em; color: var(--gilt); }
+.today-word { margin: 0; font-family: var(--font-display); font-size: 1.7rem; font-weight: 600; letter-spacing: 0.12em; line-height: 1.4; text-shadow: 0 0 20px var(--gilt-glow); }
+.lucky { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px 22px; font-size: 0.85rem; color: var(--muted); }
+.lucky b { font-weight: 600; color: var(--ink); }
+.lucky-color i { display: inline-block; width: 12px; height: 12px; border-radius: 50%; margin-right: 6px; vertical-align: -1px; border: 1px solid rgba(255,255,255,0.25); }
+
 /* カード一覧 */
 .index { border-top: 1px solid var(--rule); padding-top: 14px; }
 .index summary { cursor: pointer; font-family: var(--font-display); letter-spacing: 0.08em; color: var(--gilt); padding-block: 4px; }
 .index summary:focus-visible { outline: 2px solid var(--gilt); outline-offset: 3px; }
 .index ul { list-style: none; margin: 14px 0 0; padding: 0; display: flex; flex-direction: column; gap: 16px; }
 .index li { display: grid; grid-template-columns: 84px minmax(0, 1fr); gap: 14px; align-items: center; }
+.index li.index-head { display: block; margin-top: 12px; padding-bottom: 4px; border-bottom: 1px solid var(--rule); font-family: var(--font-display); font-size: 0.9rem; letter-spacing: 0.2em; color: var(--gilt); }
+.index li.index-head:first-child { margin-top: 0; }
 .index .thumb { border-radius: 4px; overflow: hidden; aspect-ratio: 140 / 240; box-shadow: 0 3px 8px var(--shadow); }
 .index .thumb svg, .index .thumb img { display: block; width: 100%; height: 100%; object-fit: cover; }
 .index h3 { margin: 0; font-family: var(--font-display); font-size: 1.05rem; font-weight: 600; display: flex; gap: 8px; align-items: baseline; }
@@ -219,7 +240,7 @@ footer { text-align: center; font-size: 0.75rem; color: var(--muted); }
 <body>
 <div class="wrap">
   <header class="mast">
-    <p class="eyebrow">MAJOR ARCANA · XXII</p>
+    <p class="eyebrow">TAROT · LXXVIII</p>
     <h1>月読</h1>
     <p class="mast-rule">TSUKUYOMI</p>
     <p class="lede">知りたいことを思い浮かべて、カードをめくってください。</p>
@@ -231,17 +252,37 @@ footer { text-align: center; font-size: 0.75rem; color: var(--muted); }
       <label for="spread-one">1枚引き</label>
       <input type="radio" name="spread" id="spread-three" value="three" checked>
       <label for="spread-three">3枚引き</label>
+      <input type="radio" name="spread" id="spread-pair" value="pair">
+      <label for="spread-pair">相性</label>
+    </div>
+    <div class="field" id="partner-field" hidden>
+      <label for="partner">相手の名前（任意・この端末にだけ保存）</label>
+      <input id="partner" type="text" maxlength="20" autocomplete="off" placeholder="例：Aくん">
     </div>
     <div class="field">
       <label for="question">占いたいこと（任意）</label>
-      <input id="question" type="text" maxlength="60" autocomplete="off" placeholder="例：新しい挑戦はうまくいく？">
+      <input id="question" type="text" maxlength="60" autocomplete="off" placeholder="例：あの人に話しかけてもいい？">
     </div>
+    <div class="cats" role="radiogroup" aria-label="占いたいことの種類">
+      <span class="cat"><input type="radio" name="category" id="cat-love" value="love"><label for="cat-love">恋</label></span>
+      <span class="cat"><input type="radio" name="category" id="cat-friend" value="friend"><label for="cat-friend">友だち</label></span>
+      <span class="cat"><input type="radio" name="category" id="cat-study" value="study"><label for="cat-study">勉強・部活</label></span>
+      <span class="cat"><input type="radio" name="category" id="cat-oshi" value="oshi"><label for="cat-oshi">推し活</label></span>
+      <span class="cat"><input type="radio" name="category" id="cat-self" value="self" checked><label for="cat-self">わたし</label></span>
+    </div>
+    <div class="checks">
     <label class="check" for="allow-rev"><input type="checkbox" id="allow-rev" checked>逆位置を含める</label>
+    <label class="check" for="allow-minor"><input type="checkbox" id="allow-minor" checked>小アルカナを含める（78枚）</label>
+  </div>
   </form>
 
   <section class="spread-area" aria-label="引いたカード">
     <ol class="spread three" id="spread"></ol>
     <p class="hint" id="hint" role="status"></p>
+    <div class="streak" id="streak" hidden aria-label="連続記録">
+      <div class="moons" id="moons"></div>
+      <p class="streak-text" id="streak-text"></p>
+    </div>
     <div class="actions">
       <button class="btn" id="redeal" type="button">シャッフルして引き直す</button>
     </div>
@@ -250,14 +291,23 @@ footer { text-align: center; font-size: 0.75rem; color: var(--muted); }
   <section class="reading" id="reading" aria-label="カードの意味" aria-live="polite"></section>
   <dialog class="zoom" id="zoom" aria-label="カードの拡大表示"><div class="zoom-body" id="zoom-body"></div></dialog>
 
+  <section class="today" id="today" hidden aria-label="今日のひとこと">
+    <p class="today-label">今日のひとこと</p>
+    <p class="today-word" id="today-word"></p>
+    <div class="lucky">
+      <span class="lucky-color"><i id="lucky-swatch"></i>ラッキーカラー <b id="lucky-color"></b></span>
+      <span>ラッキーアイテム <b id="lucky-item"></b></span>
+    </div>
+  </section>
   <div class="actions" id="share" hidden>
-    <button class="btn btn-primary" id="copy" type="button">結果をコピー</button>
+    <button class="btn btn-primary" id="share-image" type="button">画像でシェア</button>
+    <button class="btn" id="copy" type="button">結果をコピー</button>
     <span class="toast" id="toast" role="status"></span>
   </div>
   <textarea id="copy-fallback" aria-label="占いの結果" readonly hidden></textarea>
 
   <details class="index">
-    <summary>22枚のカードと意味</summary>
+    <summary>78枚のカードと意味</summary>
     <ul id="index-list"></ul>
   </details>
 
@@ -269,17 +319,24 @@ footer { text-align: center; font-size: 0.75rem; color: var(--muted); }
   <footer>占いの結果は、娯楽としてお楽しみください。</footer>
 </div>
 
+<script>const READINGS = {};</script>
+<script src="readings/love.js"></script>
+<script src="readings/friend.js"></script>
+<script src="readings/study.js"></script>
+<script src="readings/oshi.js"></script>
+<script src="readings/self.js"></script>
+<script src="readings/extra.js"></script>
 <script>
 "use strict";
 
 /* ===== 設定：自作のカード画像を使う場合 =====
-   cards フォルダに 00.jpg〜21.jpg（縦長、比率 7:12 前後）を置き、
+   cards フォルダに 00.jpg〜77.jpg（縦長、比率 7:12 前後）を置き、
    下の CARD_IMAGES を true に変えると、内蔵の図柄の代わりに画像を表示します。 */
 const CARD_IMAGES = true;
 const cardImagePath = i => `cards/${String(i).padStart(2, "0")}.jpg`;
 
 /* ===== 大アルカナ22枚 ===== */
-const CARDS = [
+const MAJOR = [
   { num: "0", jp: "愚者", en: "The Fool",
     up: ["自由", "始まり", "冒険"], upText: "新しい一歩を踏み出すときです。先が見えなくても、身軽さがあなたの味方になります。",
     rev: ["無計画", "軽率", "迷い"], revText: "勢いだけで進むと足元をすくわれそうです。動く前に一度、行き先を確かめましょう。" },
@@ -348,9 +405,201 @@ const CARDS = [
     rev: ["未完成", "あと一歩", "マンネリ"], revText: "あと少しのところで止まっています。最後の仕上げに力を注ぎましょう。" }
 ];
 
+/* ===== 小アルカナ56枚 ===== */
+const MINOR = [
+  /* ワンド（棒）：情熱・行動・意志 */
+  { num: "ACE", jp: "ワンドのエース", en: "Ace of Wands", suit: "wands",
+    up: ["ひらめき", "情熱", "着手"], upText: "やりたいことの火種が灯ります。小さくてもいいので、今日のうちに最初の一手を打ちましょう。",
+    rev: ["空回り", "延期", "気力不足"], revText: "やる気はあっても形になりにくいときです。計画を小さく切り直すと、火がつきやすくなります。" },
+  { num: "II", jp: "ワンドの2", en: "Two of Wands", suit: "wands",
+    up: ["展望", "計画", "選択"], upText: "手の中に世界があります。行き先を決めれば、準備は整っています。遠くを見て決めましょう。",
+    rev: ["ためらい", "視野の狭さ", "現状維持"], revText: "安全な場所から動けずにいます。小さな冒険を一つ、自分に許してみてください。" },
+  { num: "III", jp: "ワンドの3", en: "Three of Wands", suit: "wands",
+    up: ["拡大", "見通し", "協力"], upText: "送り出したものが戻ってくる兆しです。待つ時間も進んでいます。視線を遠くへ向けましょう。",
+    rev: ["遅れ", "見込み違い", "孤軍奮闘"], revText: "期待した結果が届きません。計画のどこかに無理がないか、人の手を借りて見直しましょう。" },
+  { num: "IV", jp: "ワンドの4", en: "Four of Wands", suit: "wands",
+    up: ["祝福", "安定", "帰る場所"], upText: "ひと区切りを祝うときです。支えてくれた人と喜びを分け合うと、次の土台が固まります。",
+    rev: ["不安定", "祝えない", "居心地の悪さ"], revText: "落ち着けない事情があります。無理に祝わず、まず自分の居場所を整えることから始めましょう。" },
+  { num: "V", jp: "ワンドの5", en: "Five of Wands", suit: "wands",
+    up: ["競争", "摩擦", "切磋琢磨"], upText: "意見がぶつかり合うときです。勝ち負けではなく、良い案を磨くための衝突だと受け止めましょう。",
+    rev: ["対立の回避", "内なる葛藤", "収束"], revText: "争いを避けたい気持ちが強まっています。自分の中の矛盾を言葉にすると、落としどころが見えます。" },
+  { num: "VI", jp: "ワンドの6", en: "Six of Wands", suit: "wands",
+    up: ["勝利", "承認", "自信"], upText: "努力が認められます。素直に受け取ってください。称賛は次に進むための燃料です。",
+    rev: ["評価されない", "自信過剰", "挫折"], revText: "思ったほど認められず、気持ちが沈みがちです。評価より、自分が納得できたかを基準にしましょう。" },
+  { num: "VII", jp: "ワンドの7", en: "Seven of Wands", suit: "wands",
+    up: ["防衛", "信念", "踏ん張り"], upText: "立場を守るときです。押し寄せる声に対して、自分の軸を手放さなければ優位は保てます。",
+    rev: ["圧倒される", "降参", "疲弊"], revText: "守り続けることに疲れています。全部を守ろうとせず、本当に譲れないものだけに絞りましょう。" },
+  { num: "VIII", jp: "ワンドの8", en: "Eight of Wands", suit: "wands",
+    up: ["急展開", "知らせ", "勢い"], upText: "物事が一気に動きます。迷っている暇はありません。流れに乗って、素早く返事をしましょう。",
+    rev: ["遅延", "すれ違い", "焦り"], revText: "急ぎたいのに進みません。連絡の行き違いに注意し、速さより確実さを選びましょう。" },
+  { num: "IX", jp: "ワンドの9", en: "Nine of Wands", suit: "wands",
+    up: ["粘り", "警戒", "最後の壁"], upText: "傷つきながらも立っています。ゴールはすぐそこです。あと一歩だけ、持ちこたえましょう。",
+    rev: ["消耗", "疑心", "諦め"], revText: "警戒しすぎて疲れ切っています。すべてが敵ではありません。信頼できる人に背中を預けましょう。" },
+  { num: "X", jp: "ワンドの10", en: "Ten of Wands", suit: "wands",
+    up: ["重責", "抱え込み", "やり遂げる"], upText: "荷物が多すぎます。やり遂げる力はありますが、全部を一人で運ぶ必要はありません。",
+    rev: ["手放す", "限界", "分担"], revText: "もう限界が近いようです。誰かに渡せるものを渡しましょう。降ろすことも前進です。" },
+  { num: "PAGE", jp: "ワンドのペイジ", en: "Page of Wands", suit: "wands",
+    up: ["好奇心", "挑戦", "吉報"], upText: "わくわくする知らせが届きます。経験が足りなくても、熱意が道を開きます。まず飛び込んでみましょう。",
+    rev: ["飽きっぽさ", "未熟", "空振り"], revText: "勢いだけで始めて続かないかもしれません。始める前に、何のためにやるのかを一言で言えるようにしましょう。" },
+  { num: "KNIGHT", jp: "ワンドのナイト", en: "Knight of Wands", suit: "wands",
+    up: ["突進", "冒険", "情熱的"], upText: "考えるより先に体が動くときです。その勢いは魅力ですが、行き先だけは決めてから駆け出しましょう。",
+    rev: ["無謀", "短気", "中断"], revText: "焦りが先走って衝突を招きそうです。一呼吸置いてから動けば、同じ情熱が正しく届きます。" },
+  { num: "QUEEN", jp: "ワンドのクイーン", en: "Queen of Wands", suit: "wands",
+    up: ["明るさ", "自立", "人を惹きつける"], upText: "あなたの温かさが人を集めます。遠慮せず、自分らしく振る舞うことが一番の魅力になります。",
+    rev: ["嫉妬", "気分屋", "威圧"], revText: "自信が強さではなく、刺々しさとして伝わっています。まず自分をいたわると、周りにも優しくなれます。" },
+  { num: "KING", jp: "ワンドのキング", en: "King of Wands", suit: "wands",
+    up: ["指導力", "ビジョン", "決断"], upText: "大きな絵を描き、人を導くときです。あなたの決断が周りの迷いを晴らします。堂々と示しましょう。",
+    rev: ["独善", "横暴", "方向の喪失"], revText: "強引さが目立っています。目的を見失っていませんか。人の声を聞くことがリーダーの仕事です。" },
+
+  /* カップ（聖杯）：感情・愛・つながり */
+  { num: "ACE", jp: "カップのエース", en: "Ace of Cups", suit: "cups",
+    up: ["愛の芽生え", "感動", "癒やし"], upText: "心があふれる出来事が訪れます。受け取ることを恐れないでください。感情は満ちるためにあります。",
+    rev: ["空虚", "抑圧", "すれ違う気持ち"], revText: "気持ちが乾いているようです。無理に明るく振る舞わず、何に心が動かないのかを静かに見つめましょう。" },
+  { num: "II", jp: "カップの2", en: "Two of Cups", suit: "cups",
+    up: ["相思相愛", "信頼", "対等な関係"], upText: "気持ちが通じ合います。言葉にすれば、相手も同じものを差し出してくれるでしょう。",
+    rev: ["不均衡", "誤解", "距離"], revText: "どちらかが与えすぎています。対等でない関係は長く続きません。率直に話す時間を作りましょう。" },
+  { num: "III", jp: "カップの3", en: "Three of Cups", suit: "cups",
+    up: ["祝祭", "友情", "分かち合い"], upText: "仲間と喜びを分け合うときです。一人で抱えていた嬉しさを、声に出して伝えましょう。",
+    rev: ["孤立", "噂話", "過剰"], revText: "輪の中にいても孤独を感じています。付き合いのための付き合いを減らし、本当に話したい人に会いましょう。" },
+  { num: "IV", jp: "カップの4", en: "Four of Cups", suit: "cups",
+    up: ["倦怠", "内省", "見逃している好機"], upText: "目の前の差し出されたものに気づいていません。退屈の正体は、受け取ろうとしない心かもしれません。",
+    rev: ["気づき", "再始動", "受け入れ"], revText: "長い停滞から目を上げるときです。差し出された手を取ってみましょう。景色が変わります。" },
+  { num: "V", jp: "カップの5", en: "Five of Cups", suit: "cups",
+    up: ["喪失", "後悔", "残されたもの"], upText: "失ったものを見つめる時間も必要です。でも背後には、まだ倒れていない杯が残っています。",
+    rev: ["立ち直り", "受容", "前を向く"], revText: "悲しみが少しずつ和らぎます。残ったものを数えると、思ったより多いことに気づくでしょう。" },
+  { num: "VI", jp: "カップの6", en: "Six of Cups", suit: "cups",
+    up: ["懐かしさ", "純粋", "再会"], upText: "過去からの贈り物が届きます。子どもの頃のように、見返りを求めず与えてみましょう。",
+    rev: ["過去への執着", "幼さ", "思い出に逃げる"], revText: "昔は良かった、と振り返りすぎています。思い出は力になりますが、住む場所ではありません。" },
+  { num: "VII", jp: "カップの7", en: "Seven of Cups", suit: "cups",
+    up: ["空想", "選択肢の多さ", "幻惑"], upText: "魅力的な選択肢が並びすぎています。すべて手に入りそうに見えるときほど、一つを選ぶ覚悟が必要です。",
+    rev: ["現実直視", "決断", "整理"], revText: "霧が晴れて、本当に欲しいものが見えてきます。幻を手放すと、手が自由になります。" },
+  { num: "VIII", jp: "カップの8", en: "Eight of Cups", suit: "cups",
+    up: ["旅立ち", "手放す", "探求"], upText: "積み上げたものを置いて歩き出すときです。足りないのは物ではなく、意味です。探しに行きましょう。",
+    rev: ["未練", "逃避", "立ち戻る"], revText: "去りたい気持ちと留まりたい気持ちが揺れています。逃げるのか、向かうのか。それだけを問いましょう。" },
+  { num: "IX", jp: "カップの9", en: "Nine of Cups", suit: "cups",
+    up: ["願いの成就", "満足", "ごちそう"], upText: "望んでいたものが手に入ります。胸を張って味わいましょう。満たされることに罪悪感はいりません。",
+    rev: ["虚栄", "物足りなさ", "過食"], revText: "満たされているはずなのに足りない。欲しいのは物ではなく、誰かと分かち合うことかもしれません。" },
+  { num: "X", jp: "カップの10", en: "Ten of Cups", suit: "cups",
+    up: ["家族", "調和", "幸福"], upText: "大切な人たちとの穏やかな時間が訪れます。特別なことをしなくても、それ自体が答えです。",
+    rev: ["不和", "理想とのずれ", "表面的な平和"], revText: "外から見える幸せと、内側の気持ちがずれています。取り繕うより、小さな本音を一つ伝えましょう。" },
+  { num: "PAGE", jp: "カップのペイジ", en: "Page of Cups", suit: "cups",
+    up: ["感受性", "ひらめき", "思いがけない知らせ"], upText: "心が柔らかく開いています。小さな驚きや直感を見逃さないでください。そこに芽があります。",
+    rev: ["感情的", "現実逃避", "傷つきやすさ"], revText: "気持ちが揺れやすく、空想に逃げがちです。感じたことを紙に書くと、少し地に足がつきます。" },
+  { num: "KNIGHT", jp: "カップのナイト", en: "Knight of Cups", suit: "cups",
+    up: ["ロマンス", "誘い", "理想を追う"], upText: "心を込めた申し出が届きます。あるいは、あなたが差し出す番です。優雅に、真っ直ぐに。",
+    rev: ["気まぐれ", "口先だけ", "幻滅"], revText: "美しい言葉に中身が伴っていないかもしれません。約束より行動を見ましょう。自分の約束も含めて。" },
+  { num: "QUEEN", jp: "カップのクイーン", en: "Queen of Cups", suit: "cups",
+    up: ["思いやり", "直感", "受容"], upText: "人の気持ちがよく分かるときです。その力で誰かを支えられます。ただし、自分の杯も空にしないで。",
+    rev: ["依存", "過剰な共感", "自分を見失う"], revText: "人の感情を背負いすぎています。他人の悲しみを自分のものにする必要はありません。境界線を引きましょう。" },
+  { num: "KING", jp: "カップのキング", en: "King of Cups", suit: "cups",
+    up: ["包容力", "感情の成熟", "落ち着き"], upText: "波立つ状況でも、あなたは静かに座っていられます。その落ち着きが周りの支えになります。",
+    rev: ["感情の抑圧", "操作", "不安定"], revText: "平静を装う裏で、感情が渦巻いています。押し込めた気持ちは別の形で漏れます。信頼できる人に話しましょう。" },
+
+  /* ソード（剣）：思考・言葉・決断 */
+  { num: "ACE", jp: "ソードのエース", en: "Ace of Swords", suit: "swords",
+    up: ["明晰", "真実", "突破"], upText: "頭が冴え、物事の芯が見えます。はっきり言うべきことを言いましょう。言葉が道を切り開きます。",
+    rev: ["混乱", "誤った判断", "言葉の刃"], revText: "考えがまとまらず、言葉が人を傷つけそうです。結論を急がず、情報を整理してから口を開きましょう。" },
+  { num: "II", jp: "ソードの2", en: "Two of Swords", suit: "swords",
+    up: ["膠着", "決めかねる", "心を閉ざす"], upText: "目隠しをして均衡を保っています。見ないことで守っているものがあります。でも、いつかは目を開ける必要があります。",
+    rev: ["決断", "情報の開示", "混乱の解消"], revText: "目隠しが外れ、選ばざるを得なくなります。つらくても、動き出せば楽になります。" },
+  { num: "III", jp: "ソードの3", en: "Three of Swords", suit: "swords",
+    up: ["心の痛み", "裏切り", "別れ"], upText: "胸を刺す出来事があります。痛みを感じきることが、回復への一番の近道です。雨はやがて止みます。",
+    rev: ["癒やし", "許し", "痛みの整理"], revText: "傷が少しずつふさがります。許すのは相手のためではなく、自分が前に進むためです。" },
+  { num: "IV", jp: "ソードの4", en: "Four of Swords", suit: "swords",
+    up: ["休息", "静養", "充電"], upText: "戦いを一時中断するときです。休むことは逃げではありません。回復した頭で、また考えましょう。",
+    rev: ["休めない", "焦り", "再始動"], revText: "休むべきなのに動いてしまいます。あるいは、休みが終わる合図です。体の声を優先しましょう。" },
+  { num: "V", jp: "ソードの5", en: "Five of Swords", suit: "swords",
+    up: ["むなしい勝利", "対立", "自分本位"], upText: "勝っても何かを失う争いです。正しさを押し通す前に、その後に何が残るかを考えましょう。",
+    rev: ["和解", "後悔", "撤退"], revText: "争いの空しさに気づきます。負けを認める勇気が、関係を取り戻す鍵になります。" },
+  { num: "VI", jp: "ソードの6", en: "Six of Swords", suit: "swords",
+    up: ["移行", "静かな旅立ち", "回復へ"], upText: "荒れた岸を離れ、穏やかな水面へ向かいます。寂しさはありますが、確かに前へ進んでいます。",
+    rev: ["抜け出せない", "未解決", "引き戻される"], revText: "離れたい場所から離れられません。荷物が重すぎるのかもしれません。何を置いていくか決めましょう。" },
+  { num: "VII", jp: "ソードの7", en: "Seven of Swords", suit: "swords",
+    up: ["策略", "ひそかな行動", "要領"], upText: "正面突破ではなく、知恵で切り抜けるときです。ただし、誰かを欺く形にならないよう気をつけて。",
+    rev: ["露見", "良心", "正直になる"], revText: "隠していたことが明るみに出ます。先に自分から話せば、信頼は取り戻せます。" },
+  { num: "VIII", jp: "ソードの8", en: "Eight of Swords", suit: "swords",
+    up: ["束縛", "思い込み", "身動きできない"], upText: "縛られているように感じますが、縄は緩く、剣は刺さっていません。動けないのは思い込みかもしれません。",
+    rev: ["解放", "視界が開ける", "自由"], revText: "目隠しが外れます。自分で自分を閉じ込めていたことに気づいたとき、扉は開いています。" },
+  { num: "IX", jp: "ソードの9", en: "Nine of Swords", suit: "swords",
+    up: ["不安", "眠れない夜", "悔い"], upText: "夜中に心配が膨らんでいます。壁の剣はあなたを刺していません。朝になれば、恐れは少し小さく見えます。",
+    rev: ["夜明け", "不安の緩和", "助けを求める"], revText: "最悪の想像が現実にならないと分かってきます。一人で抱えず、誰かに言葉にして渡しましょう。" },
+  { num: "X", jp: "ソードの10", en: "Ten of Swords", suit: "swords",
+    up: ["終わり", "底", "どん底からの夜明け"], upText: "これ以上は落ちません。終わったものは終わりました。背後の空には、もう夜明けが始まっています。",
+    rev: ["回復", "再生", "教訓"], revText: "最悪は過ぎました。起き上がるときです。失ったものより、残った教訓を持って行きましょう。" },
+  { num: "PAGE", jp: "ソードのペイジ", en: "Page of Swords", suit: "swords",
+    up: ["好奇心", "観察", "新しい考え"], upText: "知りたい気持ちが高まっています。質問し、調べ、確かめましょう。ただし人の秘密を探る方向には使わないで。",
+    rev: ["軽率な発言", "詮索", "空論"], revText: "言葉が先走り、考えが浅くなりがちです。聞いたことを確かめる前に広めないよう注意しましょう。" },
+  { num: "KNIGHT", jp: "ソードのナイト", en: "Knight of Swords", suit: "swords",
+    up: ["突進", "論理", "決断力"], upText: "迷いなく切り込むときです。そのスピードは武器になります。ただ、置いていかれる人がいないかだけ振り返って。",
+    rev: ["攻撃的", "無鉄砲", "暴走"], revText: "正しさを急ぐあまり、人を切りつけています。速度を落として、誰のための議論かを思い出しましょう。" },
+  { num: "QUEEN", jp: "ソードのクイーン", en: "Queen of Swords", suit: "swords",
+    up: ["聡明", "率直", "自立"], upText: "感情に流されず、物事を見通せます。はっきり伝える言葉が、相手にとっても親切になります。",
+    rev: ["冷淡", "辛辣", "孤独"], revText: "鋭さが冷たさとして伝わっています。正しい指摘でも、言い方ひとつで届き方が変わります。" },
+  { num: "KING", jp: "ソードのキング", en: "King of Swords", suit: "swords",
+    up: ["公正", "判断力", "権威"], upText: "感情を脇に置いて、公平に裁くときです。あなたの判断は信頼されています。筋を通しましょう。",
+    rev: ["冷酷", "権力の乱用", "偏った判断"], revText: "正しさが硬直し、人を見なくなっています。規則の前に、目の前の人の事情を一度聞きましょう。" },
+
+  /* ペンタクル（金貨）：現実・仕事・豊かさ */
+  { num: "ACE", jp: "ペンタクルのエース", en: "Ace of Pentacles", suit: "pentacles",
+    up: ["新しい収入", "好機", "堅実な始まり"], upText: "形あるチャンスが手渡されます。小さな種でも、育てれば確かな実りになります。受け取って植えましょう。",
+    rev: ["逃した好機", "金銭の不安", "計画倒れ"], revText: "チャンスを逃したか、見えていないかもしれません。欲張らず、目の前の確実な一歩に戻りましょう。" },
+  { num: "II", jp: "ペンタクルの2", en: "Two of Pentacles", suit: "pentacles",
+    up: ["やりくり", "両立", "柔軟さ"], upText: "複数のことを同時に回しています。今は器用に保てていますが、どちらを優先するか決めておくと楽になります。",
+    rev: ["手に余る", "混乱", "収支の乱れ"], revText: "回していたものが落ちそうです。全部を持ち続けるより、一つを一旦置く勇気を持ちましょう。" },
+  { num: "III", jp: "ペンタクルの3", en: "Three of Pentacles", suit: "pentacles",
+    up: ["協働", "技術", "評価される仕事"], upText: "腕が認められ、人と組んで良いものが作れます。得意を持ち寄れば、一人では届かない高さに届きます。",
+    rev: ["連携不足", "手抜き", "評価されない"], revText: "足並みが揃っていません。役割と目的をもう一度確認し、仕事の質を落とさないようにしましょう。" },
+  { num: "IV", jp: "ペンタクルの4", en: "Four of Pentacles", suit: "pentacles",
+    up: ["守る", "蓄える", "執着"], upText: "手に入れたものを大事に守るときです。ただ、握りしめすぎると新しいものを受け取る手がなくなります。",
+    rev: ["手放す", "浪費", "執着からの解放"], revText: "握っていたものを緩めるときです。惜しみなく使うことで、流れが戻ってきます。" },
+  { num: "V", jp: "ペンタクルの5", en: "Five of Pentacles", suit: "pentacles",
+    up: ["欠乏", "孤立", "苦境"], upText: "寒さと不安の中にいます。でも、すぐそばに灯りのついた窓があります。助けを求めることは恥ではありません。",
+    rev: ["回復の兆し", "支援", "困難の終わり"], revText: "苦しい時期が終わりに近づいています。差し伸べられた手を取りましょう。扉はもう開いています。" },
+  { num: "VI", jp: "ペンタクルの6", en: "Six of Pentacles", suit: "pentacles",
+    up: ["施し", "公平", "与え受け取る"], upText: "持っているものを分け合うときです。与える側でも受け取る側でも、感謝の循環があなたを豊かにします。",
+    rev: ["不公平", "見返りを求める", "借り"], revText: "与えることに損得が混じっています。あるいは、受け取るばかりで苦しいのかもしれません。対等さを取り戻しましょう。" },
+  { num: "VII", jp: "ペンタクルの7", en: "Seven of Pentacles", suit: "pentacles",
+    up: ["忍耐", "成長の見極め", "長期的視点"], upText: "蒔いたものは育っています。収穫はまだ先ですが、焦らないでください。今は手入れを続けるときです。",
+    rev: ["報われない努力", "焦り", "見直し"], revText: "手をかけたのに実りが少ないと感じています。畑そのものを変えるべきか、冷静に見極めましょう。" },
+  { num: "VIII", jp: "ペンタクルの8", en: "Eight of Pentacles", suit: "pentacles",
+    up: ["修練", "集中", "腕を磨く"], upText: "黙々と手を動かすときです。一つひとつ丁寧に仕上げれば、確実に腕が上がります。退屈に見える反復が力になります。",
+    rev: ["惰性", "雑な仕事", "やりがいの喪失"], revText: "作業が流れ作業になっています。なぜこれをやるのか思い出せないなら、少し離れて見直しましょう。" },
+  { num: "IX", jp: "ペンタクルの9", en: "Nine of Pentacles", suit: "pentacles",
+    up: ["自立", "豊かさ", "洗練"], upText: "自分の力で築いた豊かさを楽しむときです。一人の時間を、誰にも遠慮せず味わいましょう。",
+    rev: ["見栄", "依存", "空虚な贅沢"], revText: "見た目の豊かさに自分が追いついていません。本当に欲しいものは、お金で買えるものでしょうか。" },
+  { num: "X", jp: "ペンタクルの10", en: "Ten of Pentacles", suit: "pentacles",
+    up: ["繁栄", "家系", "受け継ぐもの"], upText: "長い時間をかけて築かれた安定の中にいます。受け取ったものを、次に渡す番です。",
+    rev: ["家族の問題", "相続の争い", "安定の崩れ"], revText: "お金や家をめぐって不和が生じやすいときです。損得の前に、何を守りたいのかを共有しましょう。" },
+  { num: "PAGE", jp: "ペンタクルのペイジ", en: "Page of Pentacles", suit: "pentacles",
+    up: ["学び", "具体的な目標", "着実な一歩"], upText: "学びたいことが見つかります。夢を数字と日付に変えましょう。地道な計画が一番の近道です。",
+    rev: ["先延ばし", "散漫", "現実逃避"], revText: "計画だけが増えて手が動いていません。今日できる最小の一歩を一つ決めて、それだけやりましょう。" },
+  { num: "KNIGHT", jp: "ペンタクルのナイト", en: "Knight of Pentacles", suit: "pentacles",
+    up: ["勤勉", "責任感", "確実さ"], upText: "派手さはなくても、決めたことを最後までやり抜けます。その信頼が、長い目で一番の財産になります。",
+    rev: ["退屈", "停滞", "頑固"], revText: "慎重さが停滞に変わっています。安全な道にこだわりすぎていませんか。小さな変化を一つ許してみましょう。" },
+  { num: "QUEEN", jp: "ペンタクルのクイーン", en: "Queen of Pentacles", suit: "pentacles",
+    up: ["世話", "実務能力", "居心地のよさ"], upText: "人と暮らしを豊かに整える力があります。身の回りを心地よくすることが、周りの人への贈り物になります。",
+    rev: ["自己犠牲", "過保護", "物質主義"], revText: "人の世話で自分が後回しになっています。まず自分の器を満たしてから、人に注ぎましょう。" },
+  { num: "KING", jp: "ペンタクルのキング", en: "King of Pentacles", suit: "pentacles",
+    up: ["成功", "安定", "実業の手腕"], upText: "築き上げたものが実を結びます。堅実な判断を信じてください。あなたの安定が、人の安心になります。",
+    rev: ["強欲", "頑迷", "地位への固執"], revText: "富や地位を守ることが目的になっています。何のために築いたのかを、もう一度思い出しましょう。" },
+];
+
+const CARDS = MAJOR.concat(MINOR);
+
+const SUIT_NAMES = { wands: "ワンド（棒）", cups: "カップ（聖杯）", swords: "ソード（剣）", pentacles: "ペンタクル（金貨）" };
+
 const SPREADS = {
   one: ["今日の一枚"],
-  three: ["過去", "現在", "未来"]
+  three: ["過去", "現在", "未来"],
+  pair: ["あなた", "ふたりの間", "あの人"]
+};
+const spreadLabels = () => {
+  const labels = SPREADS[state.spread].slice();
+  if (state.spread === "pair") {
+    const name = $("partner").value.trim();
+    if (name) labels[2] = name;
+  }
+  return labels;
 };
 
 /* ===== 図柄を描く部品（座標はカード中央を原点とした±40の範囲） ===== */
@@ -434,6 +683,7 @@ const EMBLEMS = [
       + pg(starPts(4, 9, 3.5), "gf") + ci(-33, -32, 3, "kf") + ci(33, -32, 3, "kf") + ci(-33, 32, 3, "kf") + ci(33, 32, 3, "kf")
 ];
 
+const suitEmblem = c => `<circle class="gd" cx="0" cy="0" r="30"/><text class="t-jp" x="0" y="7" text-anchor="middle" font-size="20">${SUIT_NAMES[c.suit].slice(-2, -1)}</text>`;
 function faceSVG(i) {
   const c = CARDS[i];
   return `<svg viewBox="0 0 140 240" role="img" aria-label="${c.jp}">
@@ -441,7 +691,7 @@ function faceSVG(i) {
 <rect class="gd" x="7" y="7" width="126" height="226" rx="5"/>
 <rect class="hair" x="11" y="11" width="118" height="218" rx="3"/>
 <text class="t-num" x="70" y="35" text-anchor="middle">${c.num}</text>
-<g transform="translate(70 106) scale(1.12)">${EMBLEMS[i]()}</g>
+<g transform="translate(70 106) scale(1.12)">${EMBLEMS[i] ? EMBLEMS[i]() : suitEmblem(c)}</g>
 <line class="gd" x1="38" y1="174" x2="102" y2="174"/>
 <text class="t-jp" x="70" y="197" text-anchor="middle">${c.jp}</text>
 <text class="t-en" x="70" y="213" text-anchor="middle">${c.en.toUpperCase()}</text>
@@ -473,9 +723,39 @@ ${pg(starPts(8, 19, 7.5, 70, 120), "bk-fill")}
 const faceHTML = i => CARD_IMAGES ? `<img src="${cardImagePath(i)}" alt="${CARDS[i].jp}">` : faceSVG(i);
 const backHTML = () => CARD_IMAGES ? `<img src="cards/back.jpg" alt="" aria-hidden="true">` : backSVG();
 
+/* ===== 連続記録（今日の一枚をめくった日を端末に保存） ===== */
+function loadDays() { try { return JSON.parse(localStorage.getItem("days") || "[]"); } catch (e) { return []; } }
+function markToday() {
+  const days = loadDays(); const t = todayKey();
+  if (!days.includes(t)) { days.push(t); try { localStorage.setItem("days", JSON.stringify(days.slice(-400))); } catch (e) {} }
+}
+function streakCount() {
+  const set = new Set(loadDays());
+  const d = new Date(); let n = 0;
+  const key = x => `${x.getFullYear()}-${String(x.getMonth() + 1).padStart(2, "0")}-${String(x.getDate()).padStart(2, "0")}`;
+  if (!set.has(key(d))) d.setDate(d.getDate() - 1);
+  while (set.has(key(d))) { n++; d.setDate(d.getDate() - 1); }
+  return n;
+}
+function renderStreak() {
+  const box = $("streak");
+  box.hidden = state.spread !== "one";
+  if (box.hidden) return;
+  const n = streakCount();
+  const lit = n === 0 ? 0 : (n % 7 === 0 ? 7 : n % 7);
+  $("moons").innerHTML = Array.from({ length: 7 }, (_, k) => `<i class="${k < lit ? "on" : ""}"></i>`).join("");
+  $("streak-text").textContent = n === 0 ? "今日の一枚は毎日かわります。めくると月が満ちていきます。"
+    : lit === 7 ? `${n}日連続 ・ 満月です` : `${n}日連続 ・ 満月まであと${7 - lit}日`;
+}
+
 /* ===== 占いの進行 ===== */
 const $ = id => document.getElementById(id);
-const state = { spread: "three", drawn: [] };
+const state = { spread: "three", category: "self", drawn: [] };
+const readingText = d => {
+  const r = READINGS[state.category] && READINGS[state.category][d.i];
+  const c = CARDS[d.i];
+  return r ? r[d.rev ? 1 : 0] : (d.rev ? c.revText : c.upText);
+};
 
 function rand(n) {
   const buf = new Uint32Array(1);
@@ -484,15 +764,27 @@ function rand(n) {
   return buf[0] % n;
 }
 
+/* 日付（YYYY-MM-DD）とそれに基づく乱数。今日の一枚は日付で決まる */
+const todayKey = () => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`; };
+function seededRand(seedStr) {
+  let h = 2166136261;
+  for (const ch of seedStr) { h ^= ch.charCodeAt(0); h = Math.imul(h, 16777619); }
+  return n => { h ^= h << 13; h ^= h >>> 17; h ^= h << 5; return (h >>> 0) % n; };
+}
 function deal() {
-  const deck = CARDS.map((_, i) => i);
+  const allowMinor = $("allow-minor").checked;
+  const deck = CARDS.map((_, i) => i).filter(i => allowMinor || i < MAJOR.length);
+  const allowRev = $("allow-rev").checked;
+  const daily = state.spread === "one";
+  const r = daily ? seededRand(`tsukuyomi:${todayKey()}:${deck.length}`) : rand;
   for (let k = deck.length - 1; k > 0; k--) {
-    const j = rand(k + 1);
+    const j = r(k + 1);
     [deck[k], deck[j]] = [deck[j], deck[k]];
   }
-  const allowRev = $("allow-rev").checked;
   state.drawn = deck.slice(0, SPREADS[state.spread].length)
-    .map(i => ({ i, rev: allowRev && rand(2) === 1, open: false }));
+    .map(i => ({ i, rev: allowRev && r(2) === 1, open: false }));
+  $("redeal").hidden = daily;
+  renderStreak();
   renderSpread();
   renderReading();
 }
@@ -500,7 +792,7 @@ function deal() {
 const orientation = d => d.rev ? "逆位置" : "正位置";
 
 function renderSpread() {
-  const labels = SPREADS[state.spread];
+  const labels = spreadLabels();
   const ol = $("spread");
   ol.className = `spread ${state.spread}`;
   ol.innerHTML = state.drawn.map((d, k) => `
@@ -516,10 +808,10 @@ function renderSpread() {
 }
 
 function renderReading() {
-  const labels = SPREADS[state.spread];
+  const labels = spreadLabels();
   const opened = state.drawn.filter(d => d.open).length;
   const left = state.drawn.length - opened;
-  $("hint").textContent = left === state.drawn.length ? "カードをタップしてめくってください。"
+  $("hint").textContent = left === state.drawn.length ? (state.spread === "one" ? "今日のカードをタップしてめくってください。" : "カードをタップしてめくってください。")
     : left > 0 ? `あと${left}枚めくれます。`
     : "すべてのカードをめくりました。";
   $("reading").innerHTML = state.drawn.map((d, k) => {
@@ -529,24 +821,36 @@ function renderReading() {
       <p class="entry-pos">${labels[k]}</p>
       <h2><span class="num">${c.num}</span>${c.jp}<span class="chip${d.rev ? " rev" : ""}">${orientation(d)}</span></h2>
       <p class="kw">${(d.rev ? c.rev : c.up).join("・")}</p>
-      <p class="msg">${d.rev ? c.revText : c.upText}</p>
+      <p class="msg">${readingText(d)}</p>
     </article>`;
   }).join("");
   $("share").hidden = left > 0;
+  $("today").hidden = left > 0;
+  if (left === 0) {
+    const d = state.drawn[state.drawn.length === 3 ? 1 : 0];
+    const lucky = luckyOf(d.i);
+    $("today-word").textContent = HITOKOTO[d.i];
+    $("lucky-color").textContent = lucky.color[0];
+    $("lucky-swatch").style.background = lucky.color[1];
+    $("lucky-item").textContent = lucky.item;
+  }
   $("toast").textContent = "";
   $("copy-fallback").hidden = true;
 }
 
 function resultText() {
-  const labels = SPREADS[state.spread];
+  const labels = spreadLabels();
   const q = $("question").value.trim();
   const lines = ["月読"];
   if (q) lines.push(`占いたいこと：${q}`);
   state.drawn.forEach((d, k) => {
     const c = CARDS[d.i];
     lines.push("", `【${labels[k]}】${c.num} ${c.jp}（${orientation(d)}）`,
-      (d.rev ? c.rev : c.up).join("・"), d.rev ? c.revText : c.upText);
+      (d.rev ? c.rev : c.up).join("・"), readingText(d));
   });
+  const d = state.drawn[state.drawn.length === 3 ? 1 : 0];
+  const lucky = luckyOf(d.i);
+  lines.push("", `今日のひとこと：${HITOKOTO[d.i]}`, `ラッキーカラー：${lucky.color[0]}　ラッキーアイテム：${lucky.item}`);
   return lines.join("\n");
 }
 
@@ -556,6 +860,7 @@ $("spread").addEventListener("click", e => {
   const d = state.drawn[Number(btn.dataset.k)];
   if (d.open) { openZoom(d); return; }
   d.open = true;
+  if (state.spread === "one") { markToday(); renderStreak(); }
   btn.classList.add("is-open");
   btn.setAttribute("aria-label", `${CARDS[d.i].jp}（${orientation(d)}）`);
   renderReading();
@@ -572,10 +877,80 @@ $("zoom").addEventListener("click", () => $("zoom").close());
 
 $("setup").addEventListener("submit", e => e.preventDefault());
 $("setup").addEventListener("change", e => {
-  if (e.target.name === "spread") { state.spread = e.target.value; deal(); }
-  if (e.target.id === "allow-rev") deal();
+  if (e.target.name === "spread") { state.spread = e.target.value; $("partner-field").hidden = state.spread !== "pair"; deal(); }
+  if (e.target.name === "category") { state.category = e.target.value; renderReading(); }
+  if (e.target.id === "allow-rev" || e.target.id === "allow-minor") deal();
 });
 $("redeal").addEventListener("click", deal);
+$("partner").addEventListener("input", () => {
+  try { localStorage.setItem("partner", $("partner").value); } catch (e) {}
+  renderSpread(); renderReading();
+});
+try { $("partner").value = localStorage.getItem("partner") || ""; } catch (e) {}
+
+/* ===== 画像でシェア（縦長 1080×1920） ===== */
+const loadImage = src => new Promise((ok, ng) => { const im = new Image(); im.onload = () => ok(im); im.onerror = ng; im.src = src; });
+function roundRect(ctx, x, y, w, h, r) {
+  ctx.beginPath(); ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath();
+}
+async function shareImage() {
+  const W = 1080, H = 1920;
+  const cv = document.createElement("canvas"); cv.width = W; cv.height = H;
+  const ctx = cv.getContext("2d");
+  const g = ctx.createRadialGradient(W / 2, H * 0.3, 100, W / 2, H * 0.5, H * 0.8);
+  g.addColorStop(0, "#241b30"); g.addColorStop(0.5, "#15101b"); g.addColorStop(1, "#06040a");
+  ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+  const serif = '"Hiragino Mincho ProN", "Yu Mincho", "Noto Serif JP", serif';
+  ctx.textAlign = "center"; ctx.fillStyle = "#d4b26a";
+  ctx.font = `600 64px ${serif}`; ctx.fillText("月 読", W / 2, 150);
+  ctx.font = `28px ${serif}`; ctx.fillText("T S U K U Y O M I", W / 2, 200);
+  const main = state.drawn[state.drawn.length === 3 ? 1 : 0];
+  const cards = state.drawn.length === 3 ? state.drawn : [main];
+  const cw = cards.length === 3 ? 280 : 560, ch = cw * 12 / 7, gap = 30;
+  const x0 = (W - (cw * cards.length + gap * (cards.length - 1))) / 2, y0 = 270;
+  for (let k = 0; k < cards.length; k++) {
+    const d = cards[k], x = x0 + k * (cw + gap);
+    ctx.save();
+    ctx.shadowColor = "rgba(212,178,106,0.35)"; ctx.shadowBlur = 60;
+    roundRect(ctx, x, y0, cw, ch, cw * 0.06); ctx.fillStyle = "#000"; ctx.fill();
+    ctx.restore();
+    ctx.save(); roundRect(ctx, x, y0, cw, ch, cw * 0.06); ctx.clip();
+    if (CARD_IMAGES) {
+      try {
+        const im = await loadImage(cardImagePath(d.i));
+        if (d.rev) { ctx.translate(x + cw / 2, y0 + ch / 2); ctx.rotate(Math.PI); ctx.drawImage(im, -cw / 2, -ch / 2, cw, ch); }
+        else ctx.drawImage(im, x, y0, cw, ch);
+      } catch (e) { ctx.fillStyle = "#1a1322"; ctx.fillRect(x, y0, cw, ch); }
+    } else { ctx.fillStyle = "#1a1322"; ctx.fillRect(x, y0, cw, ch); }
+    ctx.restore();
+    ctx.fillStyle = "#ece2d0"; ctx.font = `600 ${cards.length === 3 ? 30 : 44}px ${serif}`;
+    ctx.fillText(`${CARDS[d.i].jp}`, x + cw / 2, y0 + ch + 56);
+    ctx.fillStyle = d.rev ? "#7fc4b5" : "#d4b26a"; ctx.font = `${cards.length === 3 ? 22 : 28}px ${serif}`;
+    ctx.fillText(orientation(d), x + cw / 2, y0 + ch + (cards.length === 3 ? 92 : 100));
+  }
+  let y = y0 + ch + 190;
+  ctx.fillStyle = "#d4b26a"; ctx.font = `26px ${serif}`; ctx.fillText("今日のひとこと", W / 2, y);
+  ctx.fillStyle = "#ece2d0"; ctx.font = `600 64px ${serif}`; ctx.fillText(HITOKOTO[main.i], W / 2, y + 90);
+  const msg = readingText(main); ctx.font = `30px ${serif}`; ctx.fillStyle = "#cfc4b2";
+  const lines = []; let cur = "";
+  for (const ch2 of msg) { cur += ch2; if (ctx.measureText(cur).width > W - 240) { lines.push(cur); cur = ""; } }
+  if (cur) lines.push(cur);
+  lines.slice(0, 4).forEach((l, k) => ctx.fillText(l, W / 2, y + 170 + k * 48));
+  const lucky = luckyOf(main.i);
+  ctx.fillStyle = "#ab9fb8"; ctx.font = `26px ${serif}`;
+  ctx.fillText(`ラッキーカラー ${lucky.color[0]}　　ラッキーアイテム ${lucky.item}`, W / 2, y + 170 + Math.min(lines.length, 4) * 48 + 60);
+  ctx.fillStyle = "#9d7a3a"; ctx.font = `22px ${serif}`; ctx.fillText("月読 ― タロット占い", W / 2, H - 80);
+  const blob = await new Promise(ok => cv.toBlob(ok, "image/png"));
+  const file = new File([blob], "tsukuyomi.png", { type: "image/png" });
+  if (navigator.canShare && navigator.canShare({ files: [file] })) {
+    try { await navigator.share({ files: [file], title: "月読" }); return; } catch (e) { if (e.name === "AbortError") return; }
+  }
+  const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "tsukuyomi.png"; a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 10000);
+  $("toast").textContent = "画像を保存しました。";
+}
+$("share-image").addEventListener("click", () => { shareImage().catch(() => { $("toast").textContent = "画像を作れませんでした。"; }); });
 
 $("copy").addEventListener("click", () => {
   const text = resultText();
@@ -595,7 +970,9 @@ $("copy").addEventListener("click", () => {
 });
 
 /* ===== カード一覧 ===== */
+const indexHead = (c, i) => i === 0 ? "大アルカナ" : (c.suit && (i === MAJOR.length || CARDS[i - 1].suit !== c.suit)) ? SUIT_NAMES[c.suit] : "";
 $("index-list").innerHTML = CARDS.map((c, i) => `
+  ${indexHead(c, i) ? `<li class="index-head">${indexHead(c, i)}</li>` : ""}
   <li>
     <div class="thumb">${faceHTML(i)}</div>
     <div>
