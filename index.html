@@ -12,6 +12,9 @@
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icons/icon-180.png">
 <link rel="icon" type="image/png" href="icons/icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&display=swap">
 <style>
 /* 端末の切り欠きやホームバーを避けるための余白 */
 html { padding: env(safe-area-inset-top, 0px) 0 env(safe-area-inset-bottom, 0px); }
@@ -23,23 +26,24 @@ img { max-width: 100%; }
 /* Layout: 夜の卓にカードを並べる1カラム（最大34rem）。上から、設定、カード、読み解き、カード一覧の順に積む */
 :root {
   color-scheme: dark;
-  --cloth: #2a1d38;
-  --cloth-lift: #3a2a4c;
-  --cloth-deep: #191022;
-  --rule: #4b3a59;
-  --ink: #f0e7d8;
-  --muted: #b5a8c2;
-  --gilt: #d8b56c;
-  --gilt-deep: #a07a34;
+  --cloth: #15101b;
+  --cloth-lift: #241b30;
+  --cloth-deep: #0b080f;
+  --rule: #3b3045;
+  --ink: #ece2d0;
+  --muted: #ab9fb8;
+  --gilt: #d4b26a;
+  --gilt-deep: #9d7a3a;
+  --gilt-glow: rgba(212, 178, 106, 0.22);
   --verdigris: #7fc4b5;
   --paper: #f2e9d6;
   --card-ink: #2b1f3a;
   --card-ink-soft: #6b5c79;
-  --back: #3b2552;
+  --back: #110c17;
   --shadow: rgba(8, 4, 14, 0.55);
   --font-display: "Hiragino Mincho ProN", "Yu Mincho", "YuMincho", "Noto Serif JP", "Noto Serif CJK JP", serif;
   --font-body: "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic", "Noto Sans JP", "Noto Sans CJK JP", sans-serif;
-  --font-latin: "Cochin", "Baskerville", "Palatino Linotype", "Book Antiqua", Georgia, serif;
+  --font-latin: "Cormorant Garamond", "Cochin", "Baskerville", "Palatino Linotype", "Book Antiqua", Georgia, serif;
   height: 100%;
   background: var(--cloth-deep);
 }
@@ -47,7 +51,9 @@ img { max-width: 100%; }
 body {
   min-height: 100%;
   margin: 0;
-  background: radial-gradient(130% 70% at 50% 0%, var(--cloth-lift), var(--cloth) 42%, var(--cloth-deep) 100%) no-repeat var(--cloth-deep);
+  background:
+    radial-gradient(90% 60% at 50% 30%, transparent 50%, rgba(0, 0, 0, 0.5) 100%) no-repeat,
+    radial-gradient(120% 60% at 50% -10%, var(--cloth-lift), var(--cloth) 45%, var(--cloth-deep) 100%) no-repeat var(--cloth-deep);
   color: var(--ink);
   font-family: var(--font-body);
   font-size: 1rem;
@@ -67,14 +73,17 @@ body {
 .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 
 /* 見出し */
-.mast { display: flex; flex-direction: column; gap: 6px; text-align: center; }
+.mast { display: flex; flex-direction: column; gap: 8px; text-align: center; }
 .eyebrow { margin: 0; font-family: var(--font-latin); font-size: 0.75rem; letter-spacing: 0.32em; color: var(--gilt); }
-h1 { margin: 0; font-family: var(--font-display); font-weight: 600; font-size: 1.9rem; line-height: 1.3; letter-spacing: 0.08em; text-wrap: balance; }
-.lede { margin: 0; color: var(--muted); font-size: 0.9rem; text-wrap: balance; }
+h1 { margin: 0; font-family: var(--font-display); font-weight: 600; font-size: 2.6rem; line-height: 1.2; letter-spacing: 0.18em; text-indent: 0.18em; text-wrap: balance; color: var(--ink); text-shadow: 0 0 24px var(--gilt-glow); }
+.mast-rule { display: flex; align-items: center; justify-content: center; gap: 14px; margin: 0; font-family: var(--font-latin); font-size: 0.72rem; letter-spacing: 0.42em; text-indent: 0.42em; color: var(--gilt); }
+.mast-rule::before, .mast-rule::after { content: ""; width: 56px; height: 1px; background: linear-gradient(90deg, transparent, var(--gilt-deep)); }
+.mast-rule::after { background: linear-gradient(90deg, var(--gilt-deep), transparent); }
+.lede { margin: 4px 0 0; color: var(--muted); font-size: 0.9rem; text-wrap: balance; }
 
 /* 設定 */
 .setup { display: flex; flex-direction: column; gap: 14px; }
-.seg { display: grid; grid-template-columns: 1fr 1fr; border: 1px solid var(--rule); border-radius: 999px; padding: 3px; position: relative; }
+.seg { display: grid; grid-template-columns: 1fr 1fr; border: 1px solid var(--gilt-deep); border-radius: 999px; padding: 3px; position: relative; }
 .seg input { position: absolute; opacity: 0; pointer-events: none; }
 .seg label { text-align: center; padding: 7px 12px; border-radius: 999px; cursor: pointer; color: var(--muted); font-size: 0.95rem; }
 .seg input:checked + label { background: var(--gilt); color: var(--cloth-deep); font-weight: 600; }
@@ -95,7 +104,14 @@ h1 { margin: 0; font-family: var(--font-display); font-weight: 600; font-size: 1
 .spread { list-style: none; margin: 0; padding: 0; width: 100%; display: grid; gap: 14px; }
 .spread.three { grid-template-columns: repeat(3, minmax(0, 1fr)); max-width: 40rem; }
 .spread.one { grid-template-columns: minmax(0, 1fr); max-width: 19rem; }
-.slot { display: flex; flex-direction: column; gap: 8px; min-width: 0; animation: deal 0.5s cubic-bezier(0.2, 0.7, 0.2, 1) backwards; }
+.slot { display: flex; flex-direction: column; gap: 8px; min-width: 0; position: relative; animation: deal 0.5s cubic-bezier(0.2, 0.7, 0.2, 1) backwards; }
+.slot::before {
+  content: ""; position: absolute; inset: -6% -28%; border-radius: 50%; pointer-events: none; z-index: 0;
+  background: radial-gradient(closest-side, var(--gilt-glow), transparent 72%);
+  opacity: 0.35; transition: opacity 1.2s ease;
+}
+.slot:has(.card.is-open)::before { opacity: 1; }
+.slot > * { position: relative; z-index: 1; }
 .slot:nth-child(2) { animation-delay: 0.12s; }
 .slot:nth-child(3) { animation-delay: 0.24s; }
 @keyframes deal { from { opacity: 0; transform: translateY(-18px) rotate(-4deg); } }
@@ -115,7 +131,7 @@ h1 { margin: 0; font-family: var(--font-display); font-weight: 600; font-size: 1
 .card.is-open .card-inner { transform: rotateY(180deg); }
 .side {
   position: absolute; inset: 0; display: block; overflow: hidden; border-radius: 6.5% / 3.8%;
-  backface-visibility: hidden; -webkit-backface-visibility: hidden; box-shadow: 0 8px 20px var(--shadow);
+  backface-visibility: hidden; -webkit-backface-visibility: hidden; box-shadow: 0 10px 28px var(--shadow), 0 0 0 1px rgba(212, 178, 106, 0.18);
 }
 .side svg, .side img { display: block; width: 100%; height: 100%; object-fit: cover; }
 .face { transform: rotateY(180deg); }
@@ -141,7 +157,7 @@ h1 { margin: 0; font-family: var(--font-display); font-weight: 600; font-size: 1
 .actions { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: center; }
 .btn {
   font: inherit; font-size: 0.95rem; color: var(--ink); background: transparent; cursor: pointer;
-  border: 1px solid var(--gilt-deep); border-radius: 4px; padding: 9px 18px;
+  border: 1px solid var(--gilt-deep); border-radius: 4px; padding: 9px 20px; letter-spacing: 0.06em;
 }
 .btn:hover { border-color: var(--gilt); }
 .btn:focus-visible { outline: 2px solid var(--gilt); outline-offset: 3px; }
@@ -149,17 +165,25 @@ h1 { margin: 0; font-family: var(--font-display); font-weight: 600; font-size: 1
 .toast { font-size: 0.85rem; color: var(--verdigris); }
 
 /* 読み解き */
-.reading { display: flex; flex-direction: column; }
-.entry { display: flex; flex-direction: column; gap: 4px; padding-block: 18px; border-top: 1px solid var(--rule); animation: rise 0.5s ease backwards; min-width: 0; }
-.entry:last-child { border-bottom: 1px solid var(--rule); }
+.reading { display: flex; flex-direction: column; gap: 18px; }
+.entry {
+  position: relative; display: flex; flex-direction: column; gap: 6px; padding: 24px 26px 22px; min-width: 0;
+  background: linear-gradient(180deg, #1a1322, #120d18); border: 1px solid var(--gilt-deep); border-radius: 6px;
+  box-shadow: 0 10px 30px var(--shadow); animation: rise 0.5s ease backwards;
+}
+.entry::before { content: ""; position: absolute; inset: 5px; border: 1px solid rgba(212, 178, 106, 0.28); border-radius: 3px; pointer-events: none; }
+.entry::after {
+  content: "\2726"; position: absolute; top: -0.65em; left: 50%; transform: translateX(-50%); padding-inline: 10px;
+  background: var(--cloth); color: var(--gilt); font-size: 0.8rem; line-height: 1;
+}
 @keyframes rise { from { opacity: 0; transform: translateY(8px); } }
-.entry-pos { margin: 0; font-family: var(--font-display); font-size: 0.8rem; letter-spacing: 0.2em; color: var(--gilt); }
-.entry h2 { margin: 0; display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; font-family: var(--font-display); font-weight: 600; font-size: 1.35rem; line-height: 1.4; }
-.entry .num { font-family: var(--font-latin); font-weight: 400; font-size: 1rem; color: var(--muted); letter-spacing: 0.08em; }
+.entry-pos { margin: 0; font-family: var(--font-display); font-size: 0.78rem; letter-spacing: 0.28em; color: var(--gilt); }
+.entry h2 { margin: 0; display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; font-family: var(--font-display); font-weight: 600; font-size: 2rem; line-height: 1.3; letter-spacing: 0.08em; }
+.entry .num { font-family: var(--font-latin); font-weight: 400; font-size: 1.1rem; color: var(--gilt); letter-spacing: 0.12em; }
 .chip { font-family: var(--font-body); font-weight: 400; font-size: 0.72rem; letter-spacing: 0.08em; padding: 1px 9px; border: 1px solid var(--gilt); color: var(--gilt); border-radius: 999px; }
 .chip.rev { border-color: var(--verdigris); color: var(--verdigris); }
-.kw { margin: 0; font-size: 0.85rem; color: var(--muted); }
-.msg { margin: 4px 0 0; max-width: 32em; }
+.kw { margin: 0; font-size: 0.85rem; color: var(--muted); letter-spacing: 0.06em; }
+.msg { margin: 8px 0 0; max-width: 32em; padding-top: 10px; border-top: 1px solid var(--rule); }
 #copy-fallback {
   width: 100%; min-height: 9rem; font: inherit; font-size: 0.85rem; color: var(--ink);
   background: var(--cloth-deep); border: 1px solid var(--rule); border-radius: 4px; padding: 10px;
@@ -197,6 +221,7 @@ footer { text-align: center; font-size: 0.75rem; color: var(--muted); }
   <header class="mast">
     <p class="eyebrow">MAJOR ARCANA · XXII</p>
     <h1>月読</h1>
+    <p class="mast-rule">TSUKUYOMI</p>
     <p class="lede">知りたいことを思い浮かべて、カードをめくってください。</p>
   </header>
 
@@ -446,6 +471,7 @@ ${pg(starPts(8, 19, 7.5, 70, 120), "bk-fill")}
 }
 
 const faceHTML = i => CARD_IMAGES ? `<img src="${cardImagePath(i)}" alt="${CARDS[i].jp}">` : faceSVG(i);
+const backHTML = () => CARD_IMAGES ? `<img src="cards/back.jpg" alt="" aria-hidden="true">` : backSVG();
 
 /* ===== 占いの進行 ===== */
 const $ = id => document.getElementById(id);
@@ -482,7 +508,7 @@ function renderSpread() {
       <span class="pos">${labels[k]}</span>
       <button class="card${d.rev ? " is-rev" : ""}" type="button" data-k="${k}" aria-label="${labels[k]}のカードをめくる">
         <span class="card-inner">
-          <span class="side">${backSVG()}</span>
+          <span class="side">${backHTML()}</span>
           <span class="side face">${faceHTML(d.i)}</span>
         </span>
       </button>
