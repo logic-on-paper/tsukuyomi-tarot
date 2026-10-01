@@ -8,8 +8,8 @@
   sw.js           Service Worker（オフラインで動かすための保存係）
   icons/          ホーム画面用のアイコン
   cards/          カード画像（00〜77.jpg と裏面 back.jpg）
-  readings/       占いたいことの種類ごとの文面（恋・友だち・勉強部活・推し活・わたし）と
-                  今日のひとこと、ラッキーカラー・アイテム
+  readings/       占いたいことの種類ごとの文面（恋・友だち・勉強部活・推し活・わたし）、
+                  辛口の図星と今日やること、今日のひとこと、ラッキーカラー・アイテム
   tools/          ComfyUI でカード画像を作り直すためのスクリプト
 
 
@@ -63,6 +63,7 @@
 
   カードの文章    readings/ の各ファイル（種類ごと）と、index.html の「大アルカナ22枚」「小アルカナ56枚」（キーワード）を書き換えます
   ひとこと        readings/extra.js の HITOKOTO、ラッキーカラー・アイテムも同じファイルです
+  辛口の図星      readings/blunt.js（カードごとに「図星の一言」と「今日やること」、正逆で 4 本）
   カードの絵      cards/README.txt の手順で画像を置きます
   アプリ名        index.html の <title> と見出し、manifest.json の name / short_name を変えます
 
