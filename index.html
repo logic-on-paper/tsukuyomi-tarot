@@ -191,8 +191,7 @@ h1 { margin: 0; flex: none; writing-mode: vertical-rl; font-family: var(--font-d
 .chip { font-family: var(--font-body); font-weight: 400; font-size: 0.72rem; letter-spacing: 0.08em; padding: 1px 9px; border: 1px solid var(--gilt); color: var(--gilt); border-radius: 999px; }
 .chip.rev { border-color: var(--verdigris); color: var(--verdigris); }
 .kw { margin: 0; font-size: 0.85rem; color: var(--muted); letter-spacing: 0.06em; }
-.sharp { margin: 8px 0 0; max-width: 32em; font-size: 1.15rem; font-weight: 600; line-height: 1.7; color: var(--ink); }
-.msg { margin: 0; max-width: 32em; color: var(--ink); opacity: 0.9; }
+.msg { margin: 8px 0 0; max-width: 32em; font-size: 1.05rem; line-height: 1.85; color: var(--ink); }
 .todo { margin: 8px 0 0; max-width: 32em; padding: 8px 12px; border-left: 2px solid var(--gilt); color: var(--ink); font-size: 0.95rem; }
 .todo span { display: block; font-size: 0.78rem; color: var(--gilt); letter-spacing: 0.06em; }
 #copy-fallback {
@@ -853,7 +852,6 @@ function renderReading() {
       <p class="entry-pos">${labels[k]}</p>
       <h2><span class="num">${c.num}</span>${c.jp}<span class="chip${d.rev ? " rev" : ""}">${orientation(d)}</span></h2>
       <p class="kw">${(d.rev ? c.rev : c.up).join("・")}</p>
-      <p class="sharp">${bluntOf(d).sharp}</p>
       <p class="msg">${readingText(d)}</p>
       <p class="todo"><span>今日やること</span>${bluntOf(d).todo}</p>
     </article>`;
@@ -880,7 +878,7 @@ function resultText() {
   state.drawn.forEach((d, k) => {
     const c = CARDS[d.i];
     lines.push("", `【${labels[k]}】${c.num} ${c.jp}（${orientation(d)}）`,
-      (d.rev ? c.rev : c.up).join("・"), bluntOf(d).sharp, readingText(d), `今日やること：${bluntOf(d).todo}`);
+      (d.rev ? c.rev : c.up).join("・"), readingText(d), `今日やること：${bluntOf(d).todo}`);
   });
   const d = state.drawn[state.drawn.length === 3 ? 1 : 0];
   const lucky = luckyOf(d.i);
@@ -966,7 +964,7 @@ async function shareImage() {
   let y = y0 + ch + 190;
   ctx.fillStyle = "#d4b26a"; ctx.font = `26px ${serif}`; ctx.fillText("今日のひとこと", W / 2, y);
   ctx.fillStyle = "#ece2d0"; ctx.font = `600 64px ${serif}`; ctx.fillText(HITOKOTO[main.i], W / 2, y + 90);
-  const msg = bluntOf(main).sharp + "　" + readingText(main); ctx.font = `30px ${serif}`; ctx.fillStyle = "#cfc4b2";
+  const msg = bluntOf(main).sharp; ctx.font = `32px ${serif}`; ctx.fillStyle = "#cfc4b2";
   const lines = []; let cur = "";
   for (const ch2 of msg) { cur += ch2; if (ctx.measureText(cur).width > W - 240) { lines.push(cur); cur = ""; } }
   if (cur) lines.push(cur);
@@ -1032,6 +1030,14 @@ $("index-list").innerHTML = CARDS.map((c, i) => `
 document.documentElement.lang = "ja";
 if (CARD_IMAGES) CARDS.forEach((_, i) => { new Image().src = cardImagePath(i); });
 renderMoon();
+/* 画面の選択を内部状態に合わせてから配る（素早い操作で取りこぼしても食い違わないように） */
+(function syncFromForm() {
+  const spread = document.querySelector('input[name="spread"]:checked');
+  const category = document.querySelector('input[name="category"]:checked');
+  if (spread) state.spread = spread.value;
+  if (category) state.category = category.value;
+  $("partner-field").hidden = state.spread !== "pair";
+})();
 deal();
 </script>
 <script>
