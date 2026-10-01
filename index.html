@@ -18,7 +18,7 @@ html { padding: env(safe-area-inset-top, 0px) 0 env(safe-area-inset-bottom, 0px)
 img { max-width: 100%; }
 [hidden] { display: none !important; }
 </style>
-<title>月あかりタロット</title>
+<title>月読</title>
 <style>
 /* Layout: 夜の卓にカードを並べる1カラム（最大34rem）。上から、設定、カード、読み解き、カード一覧の順に積む */
 :root {
@@ -191,7 +191,7 @@ footer { text-align: center; font-size: 0.75rem; color: var(--muted); }
 <div class="wrap">
   <header class="mast">
     <p class="eyebrow">MAJOR ARCANA · XXII</p>
-    <h1>月あかりタロット</h1>
+    <h1>月読</h1>
     <p class="lede">知りたいことを思い浮かべて、カードをめくってください。</p>
   </header>
 
@@ -508,7 +508,7 @@ function renderReading() {
 function resultText() {
   const labels = SPREADS[state.spread];
   const q = $("question").value.trim();
-  const lines = ["月あかりタロット"];
+  const lines = ["月読"];
   if (q) lines.push(`占いたいこと：${q}`);
   state.drawn.forEach((d, k) => {
     const c = CARDS[d.i];

@@ -1,6 +1,6 @@
 {
-  "name": "月あかりタロット",
-  "short_name": "タロット",
+  "name": "月読",
+  "short_name": "月読",
   "description": "大アルカナ22枚で占う、1枚引きと3枚引きのタロット占い",
   "lang": "ja",
   "start_url": "./",

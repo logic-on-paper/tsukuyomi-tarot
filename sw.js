@@ -1,7 +1,7 @@
-/* 月あかりタロット Service Worker
+/* 月読 Service Worker
    ファイルを端末に保存し、通信がなくてもアプリを起動できるようにします。
    アプリを更新したら VERSION の数字を上げてください（例: "v2"）。古い保存分が消えます。 */
-const VERSION = "v1";
+const VERSION = "v2";
 const PREFIX = "tsukiakari-tarot-";
 const CACHE = PREFIX + VERSION;
 
