@@ -1,0 +1,591 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="大アルカナ22枚で占う、1枚引きと3枚引きのタロット占い">
+<meta name="theme-color" content="#191022">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="タロット">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<link rel="icon" type="image/png" href="icons/icon-192.png">
+<style>
+/* 端末の切り欠きやホームバーを避けるための余白 */
+html { padding: env(safe-area-inset-top, 0px) 0 env(safe-area-inset-bottom, 0px); }
+img { max-width: 100%; }
+[hidden] { display: none !important; }
+</style>
+<title>月あかりタロット</title>
+<style>
+/* Layout: 夜の卓にカードを並べる1カラム（最大34rem）。上から、設定、カード、読み解き、カード一覧の順に積む */
+:root {
+  color-scheme: dark;
+  --cloth: #2a1d38;
+  --cloth-lift: #3a2a4c;
+  --cloth-deep: #191022;
+  --rule: #4b3a59;
+  --ink: #f0e7d8;
+  --muted: #b5a8c2;
+  --gilt: #d8b56c;
+  --gilt-deep: #a07a34;
+  --verdigris: #7fc4b5;
+  --paper: #f2e9d6;
+  --card-ink: #2b1f3a;
+  --card-ink-soft: #6b5c79;
+  --back: #3b2552;
+  --shadow: rgba(8, 4, 14, 0.55);
+  --font-display: "Hiragino Mincho ProN", "Yu Mincho", "YuMincho", "Noto Serif JP", "Noto Serif CJK JP", serif;
+  --font-body: "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic", "Noto Sans JP", "Noto Sans CJK JP", sans-serif;
+  --font-latin: "Cochin", "Baskerville", "Palatino Linotype", "Book Antiqua", Georgia, serif;
+  height: 100%;
+  background: var(--cloth-deep);
+}
+*, *::before, *::after { box-sizing: border-box; }
+body {
+  min-height: 100%;
+  margin: 0;
+  background: radial-gradient(130% 70% at 50% 0%, var(--cloth-lift), var(--cloth) 42%, var(--cloth-deep) 100%) no-repeat var(--cloth-deep);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 1rem;
+  line-height: 1.8;
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+}
+.wrap {
+  max-width: 34rem;
+  margin-inline: auto;
+  padding-inline: 20px;
+  padding-block: 28px 44px;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+
+/* 見出し */
+.mast { display: flex; flex-direction: column; gap: 6px; text-align: center; }
+.eyebrow { margin: 0; font-family: var(--font-latin); font-size: 0.75rem; letter-spacing: 0.32em; color: var(--gilt); }
+h1 { margin: 0; font-family: var(--font-display); font-weight: 600; font-size: 1.9rem; line-height: 1.3; letter-spacing: 0.08em; text-wrap: balance; }
+.lede { margin: 0; color: var(--muted); font-size: 0.9rem; text-wrap: balance; }
+
+/* 設定 */
+.setup { display: flex; flex-direction: column; gap: 14px; }
+.seg { display: grid; grid-template-columns: 1fr 1fr; border: 1px solid var(--rule); border-radius: 999px; padding: 3px; position: relative; }
+.seg input { position: absolute; opacity: 0; pointer-events: none; }
+.seg label { text-align: center; padding: 7px 12px; border-radius: 999px; cursor: pointer; color: var(--muted); font-size: 0.95rem; }
+.seg input:checked + label { background: var(--gilt); color: var(--cloth-deep); font-weight: 600; }
+.seg input:focus-visible + label { outline: 2px solid var(--ink); outline-offset: 2px; }
+.field { display: flex; flex-direction: column; gap: 4px; }
+.field label { font-size: 0.8rem; color: var(--muted); letter-spacing: 0.04em; }
+.field input {
+  font: inherit; font-size: 1rem; color: var(--ink); background: transparent;
+  border: 0; border-bottom: 1px solid var(--rule); border-radius: 0; padding: 6px 2px; width: 100%; min-width: 0;
+}
+.field input::placeholder { color: var(--card-ink-soft); }
+.field input:focus-visible { outline: none; border-bottom-color: var(--gilt); }
+.check { display: flex; align-items: center; gap: 8px; font-size: 0.9rem; color: var(--muted); cursor: pointer; }
+.check input { width: 18px; height: 18px; accent-color: var(--gilt); }
+
+/* カード */
+.spread-area { display: flex; flex-direction: column; align-items: center; gap: 16px; }
+.spread { list-style: none; margin: 0; padding: 0; width: 100%; display: grid; gap: 14px; }
+.spread.three { grid-template-columns: repeat(3, minmax(0, 1fr)); max-width: 27rem; }
+.spread.one { grid-template-columns: minmax(0, 1fr); max-width: 12.5rem; }
+.slot { display: flex; flex-direction: column; gap: 8px; min-width: 0; animation: deal 0.5s cubic-bezier(0.2, 0.7, 0.2, 1) backwards; }
+.slot:nth-child(2) { animation-delay: 0.12s; }
+.slot:nth-child(3) { animation-delay: 0.24s; }
+@keyframes deal { from { opacity: 0; transform: translateY(-18px) rotate(-4deg); } }
+.pos { text-align: center; font-family: var(--font-display); font-size: 0.85rem; letter-spacing: 0.2em; color: var(--gilt); }
+.card {
+  display: block; width: 100%; max-width: 100%; aspect-ratio: 140 / 240; padding: 0; border: 0; background: none;
+  cursor: pointer; perspective: 900px; border-radius: 6.5% / 3.8%;
+}
+.card:focus-visible { outline: 2px solid var(--gilt); outline-offset: 4px; }
+.card.is-open { cursor: default; }
+.card-inner { display: block; position: relative; width: 100%; height: 100%; transform-style: preserve-3d; transition: transform 0.75s cubic-bezier(0.2, 0.7, 0.2, 1); }
+.card.is-open .card-inner { transform: rotateY(180deg); }
+.side {
+  position: absolute; inset: 0; display: block; overflow: hidden; border-radius: 6.5% / 3.8%;
+  backface-visibility: hidden; -webkit-backface-visibility: hidden; box-shadow: 0 8px 20px var(--shadow);
+}
+.side svg, .side img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.face { transform: rotateY(180deg); }
+.card.is-rev .face { transform: rotateY(180deg) rotateZ(180deg); }
+.hint { margin: 0; color: var(--muted); font-size: 0.9rem; text-align: center; }
+
+/* カードの絵 */
+.paper { fill: var(--paper); }
+.back { fill: var(--back); }
+.ln { fill: none; stroke: var(--card-ink); stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+.gd { fill: none; stroke: var(--gilt-deep); stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+.hair { fill: none; stroke: var(--gilt-deep); stroke-width: 0.5; }
+.gf { fill: var(--gilt-deep); stroke: none; }
+.kf { fill: var(--card-ink); stroke: none; }
+.bk-line { fill: none; stroke: var(--gilt); stroke-width: 1.2; }
+.bk-hair { fill: none; stroke: var(--gilt); stroke-width: 0.5; stroke-opacity: 0.5; }
+.bk-fill { fill: var(--gilt); stroke: none; }
+.t-num { font-family: var(--font-latin); font-size: 13px; letter-spacing: 1.5px; fill: var(--card-ink); }
+.t-jp { font-family: var(--font-display); font-size: 15px; font-weight: 600; fill: var(--card-ink); }
+.t-en { font-family: var(--font-latin); font-size: 6.2px; letter-spacing: 1px; fill: var(--card-ink-soft); }
+
+/* ボタン */
+.actions { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: center; }
+.btn {
+  font: inherit; font-size: 0.95rem; color: var(--ink); background: transparent; cursor: pointer;
+  border: 1px solid var(--gilt-deep); border-radius: 4px; padding: 9px 18px;
+}
+.btn:hover { border-color: var(--gilt); }
+.btn:focus-visible { outline: 2px solid var(--gilt); outline-offset: 3px; }
+.btn-primary { background: var(--gilt); border-color: var(--gilt); color: var(--cloth-deep); font-weight: 600; }
+.toast { font-size: 0.85rem; color: var(--verdigris); }
+
+/* 読み解き */
+.reading { display: flex; flex-direction: column; }
+.entry { display: flex; flex-direction: column; gap: 4px; padding-block: 18px; border-top: 1px solid var(--rule); animation: rise 0.5s ease backwards; min-width: 0; }
+.entry:last-child { border-bottom: 1px solid var(--rule); }
+@keyframes rise { from { opacity: 0; transform: translateY(8px); } }
+.entry-pos { margin: 0; font-family: var(--font-display); font-size: 0.8rem; letter-spacing: 0.2em; color: var(--gilt); }
+.entry h2 { margin: 0; display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; font-family: var(--font-display); font-weight: 600; font-size: 1.35rem; line-height: 1.4; }
+.entry .num { font-family: var(--font-latin); font-weight: 400; font-size: 1rem; color: var(--muted); letter-spacing: 0.08em; }
+.chip { font-family: var(--font-body); font-weight: 400; font-size: 0.72rem; letter-spacing: 0.08em; padding: 1px 9px; border: 1px solid var(--gilt); color: var(--gilt); border-radius: 999px; }
+.chip.rev { border-color: var(--verdigris); color: var(--verdigris); }
+.kw { margin: 0; font-size: 0.85rem; color: var(--muted); }
+.msg { margin: 4px 0 0; max-width: 32em; }
+#copy-fallback {
+  width: 100%; min-height: 9rem; font: inherit; font-size: 0.85rem; color: var(--ink);
+  background: var(--cloth-deep); border: 1px solid var(--rule); border-radius: 4px; padding: 10px;
+}
+
+/* カード一覧 */
+.index { border-top: 1px solid var(--rule); padding-top: 14px; }
+.index summary { cursor: pointer; font-family: var(--font-display); letter-spacing: 0.08em; color: var(--gilt); padding-block: 4px; }
+.index summary:focus-visible { outline: 2px solid var(--gilt); outline-offset: 3px; }
+.index ul { list-style: none; margin: 14px 0 0; padding: 0; display: flex; flex-direction: column; gap: 16px; }
+.index li { display: grid; grid-template-columns: 56px minmax(0, 1fr); gap: 14px; align-items: center; }
+.index .thumb { border-radius: 4px; overflow: hidden; aspect-ratio: 140 / 240; box-shadow: 0 3px 8px var(--shadow); }
+.index .thumb svg, .index .thumb img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.index h3 { margin: 0; font-family: var(--font-display); font-size: 1.05rem; font-weight: 600; display: flex; gap: 8px; align-items: baseline; }
+.index h3 span { font-family: var(--font-latin); font-weight: 400; font-size: 0.85rem; color: var(--muted); }
+.index p { margin: 0; font-size: 0.85rem; color: var(--muted); line-height: 1.6; }
+.index b { font-weight: 400; color: var(--gilt); margin-right: 6px; }
+.index b.rev { color: var(--verdigris); }
+
+/* ホーム画面への追加案内 */
+.install { display: flex; gap: 12px; align-items: flex-start; border: 1px solid var(--rule); border-radius: 6px; padding: 12px 14px; font-size: 0.85rem; color: var(--muted); line-height: 1.6; }
+.install p { margin: 0; flex: 1; min-width: 0; }
+.install button { font: inherit; color: var(--gilt); background: none; border: 0; padding: 0; cursor: pointer; white-space: nowrap; }
+.install button:focus-visible { outline: 2px solid var(--gilt); outline-offset: 3px; }
+footer { text-align: center; font-size: 0.75rem; color: var(--muted); }
+
+@media (prefers-reduced-motion: reduce) {
+  .slot, .entry { animation: none; }
+  .card-inner { transition: none; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="mast">
+    <p class="eyebrow">MAJOR ARCANA · XXII</p>
+    <h1>月あかりタロット</h1>
+    <p class="lede">知りたいことを思い浮かべて、カードをめくってください。</p>
+  </header>
+
+  <form class="setup" id="setup">
+    <div class="seg" role="radiogroup" aria-label="引き方">
+      <input type="radio" name="spread" id="spread-one" value="one">
+      <label for="spread-one">1枚引き</label>
+      <input type="radio" name="spread" id="spread-three" value="three" checked>
+      <label for="spread-three">3枚引き</label>
+    </div>
+    <div class="field">
+      <label for="question">占いたいこと（任意）</label>
+      <input id="question" type="text" maxlength="60" autocomplete="off" placeholder="例：新しい挑戦はうまくいく？">
+    </div>
+    <label class="check" for="allow-rev"><input type="checkbox" id="allow-rev" checked>逆位置を含める</label>
+  </form>
+
+  <section class="spread-area" aria-label="引いたカード">
+    <ol class="spread three" id="spread"></ol>
+    <p class="hint" id="hint" role="status"></p>
+    <div class="actions">
+      <button class="btn" id="redeal" type="button">シャッフルして引き直す</button>
+    </div>
+  </section>
+
+  <section class="reading" id="reading" aria-label="カードの意味" aria-live="polite"></section>
+
+  <div class="actions" id="share" hidden>
+    <button class="btn btn-primary" id="copy" type="button">結果をコピー</button>
+    <span class="toast" id="toast" role="status"></span>
+  </div>
+  <textarea id="copy-fallback" aria-label="占いの結果" readonly hidden></textarea>
+
+  <details class="index">
+    <summary>22枚のカードと意味</summary>
+    <ul id="index-list"></ul>
+  </details>
+
+  <aside class="install" id="install" hidden>
+    <p>ホーム画面に追加すると、通信がなくてもアプリとして使えます。iPhoneでは、Safariの共有ボタンから「ホーム画面に追加」を選びます。</p>
+    <button id="install-close" type="button">閉じる</button>
+  </aside>
+
+  <footer>占いの結果は、娯楽としてお楽しみください。</footer>
+</div>
+
+<script>
+"use strict";
+
+/* ===== 設定：自作のカード画像を使う場合 =====
+   cards フォルダに 00.png〜21.png（縦長、比率 7:12 前後）を置き、
+   下の CARD_IMAGES を true に変えると、内蔵の図柄の代わりに画像を表示します。 */
+const CARD_IMAGES = false;
+const cardImagePath = i => `cards/${String(i).padStart(2, "0")}.png`;
+
+/* ===== 大アルカナ22枚 ===== */
+const CARDS = [
+  { num: "0", jp: "愚者", en: "The Fool",
+    up: ["自由", "始まり", "冒険"], upText: "新しい一歩を踏み出すときです。先が見えなくても、身軽さがあなたの味方になります。",
+    rev: ["無計画", "軽率", "迷い"], revText: "勢いだけで進むと足元をすくわれそうです。動く前に一度、行き先を確かめましょう。" },
+  { num: "I", jp: "魔術師", en: "The Magician",
+    up: ["創造", "自信", "実行力"], upText: "必要な道具はすでに手元にそろっています。考えを形にする行動を始めましょう。",
+    rev: ["空回り", "準備不足", "ごまかし"], revText: "力の使いどころがずれているようです。できることと、できるふりを分けて考えましょう。" },
+  { num: "II", jp: "女教皇", en: "The High Priestess",
+    up: ["直感", "知性", "静けさ"], upText: "答えは外ではなく内側にあります。静かな時間をとり、直感に耳を澄ませてください。",
+    rev: ["考えすぎ", "閉鎖", "神経質"], revText: "頭の中だけで結論を出そうとしていませんか。信頼できる人に話すと視界が開けます。" },
+  { num: "III", jp: "女帝", en: "The Empress",
+    up: ["豊かさ", "愛情", "実り"], upText: "育ててきたものが実を結びます。受け取ることをためらわず、豊かさを味わいましょう。",
+    rev: ["過保護", "停滞", "甘え"], revText: "与えすぎ、または甘えすぎになっていないか見直すときです。自分の世話も忘れずに。" },
+  { num: "IV", jp: "皇帝", en: "The Emperor",
+    up: ["安定", "責任", "統率"], upText: "土台を固めるときです。ルールと計画を決めれば、物事は着実に進みます。",
+    rev: ["頑固", "支配", "過信"], revText: "自分のやり方にこだわりすぎているかもしれません。少し手綱をゆるめてみましょう。" },
+  { num: "V", jp: "教皇", en: "The Hierophant",
+    up: ["信頼", "学び", "助言"], upText: "経験のある人の言葉が助けになります。基本に立ち返ることが近道です。",
+    rev: ["形式的", "束縛", "不信"], revText: "慣習や常識が窮屈に感じられるときです。自分に合う形を探してかまいません。" },
+  { num: "VI", jp: "恋人", en: "The Lovers",
+    up: ["調和", "選択", "結びつき"], upText: "心が素直に惹かれるほうを選びましょう。大切な人との関係も深まります。",
+    rev: ["迷い", "すれ違い", "誘惑"], revText: "気持ちが揺れて決めきれないようです。何を大切にしたいのか、言葉にしてみましょう。" },
+  { num: "VII", jp: "戦車", en: "The Chariot",
+    up: ["前進", "勝利", "意志"], upText: "迷いを振り切って進むときです。強い意志が、相反する力をひとつにまとめます。",
+    rev: ["暴走", "空回り", "方向違い"], revText: "急ぐほど空回りしそうです。目的地と手段をもう一度そろえ直しましょう。" },
+  { num: "VIII", jp: "力", en: "Strength",
+    up: ["勇気", "忍耐", "やさしい強さ"], upText: "力で押すより、粘り強くやさしく向き合うことが実を結びます。",
+    rev: ["自信喪失", "焦り", "無理"], revText: "自分を責めすぎていませんか。休むことも強さのひとつです。" },
+  { num: "IX", jp: "隠者", en: "The Hermit",
+    up: ["内省", "探求", "熟考"], upText: "ひとりで考える時間が必要です。小さな灯りでも、足元を照らすには十分です。",
+    rev: ["孤立", "閉じこもり", "頑な"], revText: "こもりすぎて視野が狭くなっているようです。外の空気を吸いに出ましょう。" },
+  { num: "X", jp: "運命の輪", en: "Wheel of Fortune",
+    up: ["転機", "幸運", "流れ"], upText: "流れが変わる節目です。巡ってきた機会には、迷わず乗りましょう。",
+    rev: ["停滞", "すれ違い", "時機のずれ"], revText: "今は流れが向いていないようです。無理に動かず、次の巡りを待ちましょう。" },
+  { num: "XI", jp: "正義", en: "Justice",
+    up: ["公正", "均衡", "誠実"], upText: "誠実に判断すれば、ふさわしい結果が返ってきます。感情と事実を分けて考えましょう。",
+    rev: ["不公平", "偏り", "優柔不断"], revText: "見方が片寄っているかもしれません。相手の立場からも眺めてみましょう。" },
+  { num: "XII", jp: "吊るされた男", en: "The Hanged Man",
+    up: ["忍耐", "視点の転換", "手放し"], upText: "動けないときは、見方を変える好機です。逆さから眺めると答えが見つかります。",
+    rev: ["徒労", "執着", "我慢の限界"], revText: "報われない我慢を続けていませんか。手放してよいものがあるはずです。" },
+  { num: "XIII", jp: "死神", en: "Death",
+    up: ["終わり", "再生", "区切り"], upText: "ひとつの章が終わり、次の章が始まります。終わらせることで道が開けます。",
+    rev: ["未練", "先延ばし", "再出発"], revText: "終わったことにしがみついているようです。区切りをつければ、やり直せます。" },
+  { num: "XIV", jp: "節制", en: "Temperance",
+    up: ["調和", "節度", "穏やかさ"], upText: "ほどよい加減がうまくいく鍵です。異なるものを少しずつ混ぜ合わせましょう。",
+    rev: ["不均衡", "やりすぎ", "消耗"], revText: "どこかに偏りが出ています。生活や気持ちのバランスを整え直しましょう。" },
+  { num: "XV", jp: "悪魔", en: "The Devil",
+    up: ["誘惑", "執着", "とらわれ"], upText: "やめられない何かに縛られているようです。鎖は、思っているよりゆるいものです。",
+    rev: ["解放", "断ち切り", "目覚め"], revText: "とらわれから抜け出せるときです。悪い習慣を手放すきっかけが訪れます。" },
+  { num: "XVI", jp: "塔", en: "The Tower",
+    up: ["崩壊", "衝撃", "突然の変化"], upText: "思いがけない出来事が起こりそうです。崩れたあとには、確かな土台だけが残ります。",
+    rev: ["緊迫", "先送り", "立て直し"], revText: "問題を先送りにしていませんか。小さなうちに向き合えば、被害は抑えられます。" },
+  { num: "XVII", jp: "星", en: "The Star",
+    up: ["希望", "癒やし", "ひらめき"], upText: "先行きに明るい光が見えています。理想を高く掲げ、素直な気持ちで進みましょう。",
+    rev: ["失望", "悲観", "高望み"], revText: "理想と現実の差に疲れているようです。手の届く目標から始めましょう。" },
+  { num: "XVIII", jp: "月", en: "The Moon",
+    up: ["不安", "曖昧", "潜在意識"], upText: "先が見えにくく、不安になりやすいときです。結論を急がず、夜明けを待ちましょう。",
+    rev: ["霧が晴れる", "誤解が解ける", "回復"], revText: "曖昧だったことが少しずつはっきりします。不安の正体が見えてきます。" },
+  { num: "XIX", jp: "太陽", en: "The Sun",
+    up: ["成功", "喜び", "活力"], upText: "明るい力に満ちています。自信を持って、ありのままの自分を表現しましょう。",
+    rev: ["空元気", "停滞", "延期"], revText: "力を出しきれていないようです。まずは休んで、元気を取り戻しましょう。" },
+  { num: "XX", jp: "審判", en: "Judgement",
+    up: ["復活", "決断", "目覚め"], upText: "過去の努力が報われ、再び機会が巡ってきます。呼びかけに応えるときです。",
+    rev: ["後悔", "ためらい", "未消化"], revText: "過去を引きずって決められないようです。自分を許すことから始めましょう。" },
+  { num: "XXI", jp: "世界", en: "The World",
+    up: ["完成", "達成", "調和"], upText: "ひとつの旅が完成します。達成を味わい、次の舞台へ進みましょう。",
+    rev: ["未完成", "あと一歩", "マンネリ"], revText: "あと少しのところで止まっています。最後の仕上げに力を注ぎましょう。" }
+];
+
+const SPREADS = {
+  one: ["今日の一枚"],
+  three: ["過去", "現在", "未来"]
+};
+
+/* ===== 図柄を描く部品（座標はカード中央を原点とした±40の範囲） ===== */
+const P = n => Math.round(n * 100) / 100;
+const pts = a => a.map(([x, y]) => `${P(x)},${P(y)}`).join(" ");
+const ln = (x1, y1, x2, y2, c = "ln") => `<line class="${c}" x1="${P(x1)}" y1="${P(y1)}" x2="${P(x2)}" y2="${P(y2)}"/>`;
+const ci = (cx, cy, r, c = "ln") => `<circle class="${c}" cx="${cx}" cy="${cy}" r="${r}"/>`;
+const pg = (a, c = "ln") => `<polygon class="${c}" points="${pts(a)}"/>`;
+const pl = (a, c = "ln") => `<polyline class="${c}" points="${pts(a)}"/>`;
+const pa = (d, c = "ln") => `<path class="${c}" d="${d}"/>`;
+const rc = (x, y, w, h, c = "ln") => `<rect class="${c}" x="${x}" y="${y}" width="${w}" height="${h}"/>`;
+const polar = (r, deg, cx = 0, cy = 0) => { const a = deg * Math.PI / 180; return [cx + r * Math.cos(a), cy + r * Math.sin(a)]; };
+const starPts = (n, R, r, cx = 0, cy = 0, rot = -90) =>
+  Array.from({ length: n * 2 }, (_, k) => polar(k % 2 ? r : R, rot + k * 180 / n, cx, cy));
+const rays = (n, r1, r2, cx = 0, cy = 0, c = "gd", shortBy = 0) =>
+  Array.from({ length: n }, (_, k) => {
+    const deg = k * 360 / n - 90;
+    const [x1, y1] = polar(r1, deg, cx, cy);
+    const [x2, y2] = polar(k % 2 ? r2 - shortBy : r2, deg, cx, cy);
+    return ln(x1, y1, x2, y2, c);
+  }).join("");
+const crescent = (cx, cy, R, c = "gf") =>
+  pa(`M${cx} ${cy - R}A${R} ${R} 0 1 0 ${cx} ${cy + R}A${P(R * 1.4)} ${P(R * 1.4)} 0 0 1 ${cx} ${cy - R}Z`, c);
+const lemniscate = (cy, w = 28, h = 14, c = "gd") =>
+  pa(`M0 ${cy}C${P(w * 0.36)} ${cy - h} ${w} ${cy - h} ${w} ${cy}S${P(w * 0.36)} ${cy + h} 0 ${cy}S${-w} ${cy - h} ${-w} ${cy}S${P(-w * 0.36)} ${cy + h} 0 ${cy}`, c);
+const scalePan = x => pl([[x - 10, 6], [x, -20], [x + 10, 6]]) + pa(`M${x - 12} 6A12 12 0 0 0 ${x + 12} 6Z`, "gd");
+
+const EMBLEMS = [
+  /* 0 愚者：輪と、そこから跳ね出す小さな日 */
+  () => ci(0, 6, 24) + ci(24, -24, 5, "gf") + pa("M-26 -22Q-6 -36 13 -29", "gd"),
+  /* I 魔術師：杖と無限 */
+  () => lemniscate(-24) + ln(0, -6, 0, 34) + ci(0, -6, 2.5, "kf") + ci(0, 34, 2.5, "kf"),
+  /* II 女教皇：二本の柱と月 */
+  () => rc(-34, -30, 10, 62) + rc(24, -30, 10, 62) + crescent(10, 0, 15) + ln(-38, 32, 38, 32),
+  /* III 女帝：金星の印 */
+  () => ci(0, -12, 16) + ci(0, -12, 4, "gf") + ln(0, 4, 0, 36) + ln(-12, 22, 12, 22),
+  /* IV 皇帝：王冠 */
+  () => pg([[-26, 10], [-26, -18], [-13, -3], [0, -26], [13, -3], [26, -18], [26, 10]])
+      + ci(-26, -23, 3, "gf") + ci(0, -31, 3, "gf") + ci(26, -23, 3, "gf") + ln(-26, 19, 26, 19) + ln(-26, 27, 26, 27, "gd"),
+  /* V 教皇：三重の十字と二つの鍵 */
+  () => ln(0, -36, 0, 36) + ln(-8, -22, 8, -22) + ln(-14, -8, 14, -8) + ln(-20, 6, 20, 6) + ci(-17, 27, 5, "gd") + ci(17, 27, 5, "gd"),
+  /* VI 恋人：重なる二つの輪と日 */
+  () => ci(-10, 8, 18) + ci(10, 8, 18) + ci(0, -27, 4.5, "gf") + rays(8, 7.5, 12, 0, -27),
+  /* VII 戦車：天蓋と車輪 */
+  () => pl([[-26, -8], [-26, -32], [26, -32], [26, -8]]) + pg(starPts(4, 7, 2.5, 0, -19), "gf")
+      + ci(0, 15, 20) + rays(8, 5, 20, 0, 15, "ln") + ci(0, 15, 4, "kf"),
+  /* VIII 力：無限と、支える器 */
+  () => lemniscate(-24, 24, 11) + ln(-26, 2, 26, 2) + pa("M-24 2A24 24 0 0 0 24 2", "ln") + ci(0, 12, 7, "gf"),
+  /* IX 隠者：星を入れたランタン */
+  () => ci(0, -27, 7) + pg([[0, -20], [16, -10], [16, 18], [0, 28], [-16, 18], [-16, -10]]) + pg(starPts(6, 10, 5, 0, 4), "gf") + ln(0, 28, 0, 36),
+  /* X 運命の輪 */
+  () => ci(0, 0, 32) + ci(0, 0, 22) + rays(8, 5, 32, 0, 0, "ln") + ci(0, 0, 5, "gf")
+      + ci(0, -32, 3, "gf") + ci(32, 0, 3, "gf") + ci(0, 32, 3, "gf") + ci(-32, 0, 3, "gf"),
+  /* XI 正義：天秤 */
+  () => ln(0, -29, 0, 34) + ln(-28, -20, 28, -20) + ci(0, -32, 3, "gf") + ln(-12, 34, 12, 34) + scalePan(-28) + scalePan(28),
+  /* XII 吊るされた男：梁と逆三角、光輪 */
+  () => ln(-26, -34, 26, -34) + ln(0, -34, 0, -12) + pg([[-18, -12], [18, -12], [0, 20]]) + ci(0, 29, 7, "gd") + ci(0, 29, 2.5, "gf"),
+  /* XIII 死神：鎌と、昇る日 */
+  () => ln(-16, 36, 12, -32) + pa("M12 -32Q-16 -44 -34 -12Q-12 -28 9 -24Z", "kf") + pa("M10 34A13 13 0 0 1 36 34Z", "gf") + ln(2, 34, 40, 34),
+  /* XIV 節制：二つの杯と流れ */
+  () => pg([[-36, -28], [-14, -28], [-20, -6], [-30, -6]]) + pg([[14, 8], [36, 8], [30, 30], [20, 30]])
+      + pa("M-17 -18C2 -18 10 -6 20 6", "gd") + pa("M-19 -10C-4 -10 6 0 14 8", "gd") + pa("M-15 -26C8 -26 20 -12 30 6", "gd"),
+  /* XV 悪魔：逆さの五芒星 */
+  () => ci(0, 0, 32) + pg([0, 2, 4, 1, 3].map(k => polar(32, 90 + 72 * k))) + ci(0, 0, 3, "gf"),
+  /* XVI 塔：稲妻 */
+  () => pg([[-13, 34], [-10, -12], [10, -12], [13, 34]]) + rc(-14, -24, 28, 12) + rc(-3, -2, 6, 10, "kf") + rc(-3, 18, 6, 10, "kf")
+      + pl([[38, -40], [22, -27], [30, -23], [15, -15]], "gd") + ci(-26, -8, 2.5, "gf") + ci(-31, 12, 2.5, "gf") + ci(28, 8, 2.5, "gf"),
+  /* XVII 星：大きな星と七つの小さな星 */
+  () => pg(starPts(8, 21, 8, 0, -2), "gf")
+      + Array.from({ length: 7 }, (_, k) => { const [x, y] = polar(34, k * 360 / 7 - 90, 0, -2); return pg(starPts(4, 5, 2, x, y), "kf"); }).join(""),
+  /* XVIII 月：三日月としずく */
+  () => crescent(15, -8, 24) + pg(starPts(4, 5, 2, 22, -18), "kf") + pg(starPts(4, 4, 1.6, 27, 2), "kf")
+      + ci(-12, 28, 2.5, "kf") + ci(2, 33, 2.5, "kf") + ci(16, 28, 2.5, "kf"),
+  /* XIX 太陽 */
+  () => ci(0, 0, 13, "gf") + ci(0, 0, 18) + rays(16, 22, 36, 0, 0, "ln", 8),
+  /* XX 審判：ラッパと旗 */
+  () => pg([[-34, 24], [14, -28], [30, -12]]) + rc(-6, 14, 20, 20) + ln(4, 18, 4, 30, "gd") + ln(-2, 24, 10, 24, "gd")
+      + ln(27, -29, 35, -37, "gd") + ln(33, -21, 41, -24, "gd") + ln(19, -34, 22, -42, "gd"),
+  /* XXI 世界：花輪と四隅のしるし */
+  () => `<ellipse class="ln" cx="0" cy="0" rx="22" ry="34"/><ellipse class="gd" cx="0" cy="0" rx="17" ry="29"/>`
+      + pg(starPts(4, 9, 3.5), "gf") + ci(-33, -32, 3, "kf") + ci(33, -32, 3, "kf") + ci(-33, 32, 3, "kf") + ci(33, 32, 3, "kf")
+];
+
+function faceSVG(i) {
+  const c = CARDS[i];
+  return `<svg viewBox="0 0 140 240" role="img" aria-label="${c.jp}">
+<rect class="paper" x="0" y="0" width="140" height="240"/>
+<rect class="gd" x="7" y="7" width="126" height="226" rx="5"/>
+<rect class="hair" x="11" y="11" width="118" height="218" rx="3"/>
+<text class="t-num" x="70" y="35" text-anchor="middle">${c.num}</text>
+<g transform="translate(70 106) scale(1.12)">${EMBLEMS[i]()}</g>
+<line class="gd" x1="38" y1="174" x2="102" y2="174"/>
+<text class="t-jp" x="70" y="197" text-anchor="middle">${c.jp}</text>
+<text class="t-en" x="70" y="213" text-anchor="middle">${c.en.toUpperCase()}</text>
+</svg>`;
+}
+
+function backSVG() {
+  const x0 = 7, x1 = 133, y0 = 7, y1 = 233, step = 14;
+  let lattice = "";
+  for (let c = x0 + y0 + step; c < x1 + y1; c += step) {
+    const a = Math.max(x0, c - y1), b = Math.min(x1, c - y0);
+    if (a < b) lattice += ln(a, c - a, b, c - b, "bk-hair");
+  }
+  for (let c = x0 - y1 + step; c < x1 - y0; c += step) {
+    const a = Math.max(x0, c + y0), b = Math.min(x1, c + y1);
+    if (a < b) lattice += ln(a, a - c, b, b - c, "bk-hair");
+  }
+  return `<svg viewBox="0 0 140 240" aria-hidden="true">
+<rect class="back" x="0" y="0" width="140" height="240"/>
+${lattice}
+<rect class="bk-line" x="7" y="7" width="126" height="226" rx="5"/>
+<circle class="back" cx="70" cy="120" r="30"/>
+<circle class="bk-line" cx="70" cy="120" r="30"/>
+<circle class="bk-hair" cx="70" cy="120" r="25"/>
+${pg(starPts(8, 19, 7.5, 70, 120), "bk-fill")}
+</svg>`;
+}
+
+const faceHTML = i => CARD_IMAGES ? `<img src="${cardImagePath(i)}" alt="${CARDS[i].jp}">` : faceSVG(i);
+
+/* ===== 占いの進行 ===== */
+const $ = id => document.getElementById(id);
+const state = { spread: "three", drawn: [] };
+
+function rand(n) {
+  const buf = new Uint32Array(1);
+  const limit = Math.floor(0x100000000 / n) * n;
+  do { crypto.getRandomValues(buf); } while (buf[0] >= limit);
+  return buf[0] % n;
+}
+
+function deal() {
+  const deck = CARDS.map((_, i) => i);
+  for (let k = deck.length - 1; k > 0; k--) {
+    const j = rand(k + 1);
+    [deck[k], deck[j]] = [deck[j], deck[k]];
+  }
+  const allowRev = $("allow-rev").checked;
+  state.drawn = deck.slice(0, SPREADS[state.spread].length)
+    .map(i => ({ i, rev: allowRev && rand(2) === 1, open: false }));
+  renderSpread();
+  renderReading();
+}
+
+const orientation = d => d.rev ? "逆位置" : "正位置";
+
+function renderSpread() {
+  const labels = SPREADS[state.spread];
+  const ol = $("spread");
+  ol.className = `spread ${state.spread}`;
+  ol.innerHTML = state.drawn.map((d, k) => `
+    <li class="slot">
+      <span class="pos">${labels[k]}</span>
+      <button class="card${d.rev ? " is-rev" : ""}" type="button" data-k="${k}" aria-label="${labels[k]}のカードをめくる">
+        <span class="card-inner">
+          <span class="side">${backSVG()}</span>
+          <span class="side face">${faceHTML(d.i)}</span>
+        </span>
+      </button>
+    </li>`).join("");
+}
+
+function renderReading() {
+  const labels = SPREADS[state.spread];
+  const opened = state.drawn.filter(d => d.open).length;
+  const left = state.drawn.length - opened;
+  $("hint").textContent = left === state.drawn.length ? "カードをタップしてめくってください。"
+    : left > 0 ? `あと${left}枚めくれます。`
+    : "すべてのカードをめくりました。";
+  $("reading").innerHTML = state.drawn.map((d, k) => {
+    if (!d.open) return "";
+    const c = CARDS[d.i];
+    return `<article class="entry">
+      <p class="entry-pos">${labels[k]}</p>
+      <h2><span class="num">${c.num}</span>${c.jp}<span class="chip${d.rev ? " rev" : ""}">${orientation(d)}</span></h2>
+      <p class="kw">${(d.rev ? c.rev : c.up).join("・")}</p>
+      <p class="msg">${d.rev ? c.revText : c.upText}</p>
+    </article>`;
+  }).join("");
+  $("share").hidden = left > 0;
+  $("toast").textContent = "";
+  $("copy-fallback").hidden = true;
+}
+
+function resultText() {
+  const labels = SPREADS[state.spread];
+  const q = $("question").value.trim();
+  const lines = ["月あかりタロット"];
+  if (q) lines.push(`占いたいこと：${q}`);
+  state.drawn.forEach((d, k) => {
+    const c = CARDS[d.i];
+    lines.push("", `【${labels[k]}】${c.num} ${c.jp}（${orientation(d)}）`,
+      (d.rev ? c.rev : c.up).join("・"), d.rev ? c.revText : c.upText);
+  });
+  return lines.join("\n");
+}
+
+$("spread").addEventListener("click", e => {
+  const btn = e.target.closest(".card");
+  if (!btn) return;
+  const d = state.drawn[Number(btn.dataset.k)];
+  if (d.open) return;
+  d.open = true;
+  btn.classList.add("is-open");
+  btn.setAttribute("aria-label", `${CARDS[d.i].jp}（${orientation(d)}）`);
+  renderReading();
+});
+
+$("setup").addEventListener("submit", e => e.preventDefault());
+$("setup").addEventListener("change", e => {
+  if (e.target.name === "spread") { state.spread = e.target.value; deal(); }
+  if (e.target.id === "allow-rev") deal();
+});
+$("redeal").addEventListener("click", deal);
+
+$("copy").addEventListener("click", () => {
+  const text = resultText();
+  const fallback = () => {
+    const ta = $("copy-fallback");
+    ta.value = text;
+    ta.hidden = false;
+    ta.focus();
+    ta.select();
+    $("toast").textContent = "下の文章を選択してコピーしてください。";
+  };
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(() => { $("toast").textContent = "コピーしました。"; }, fallback);
+  } else {
+    fallback();
+  }
+});
+
+/* ===== カード一覧 ===== */
+$("index-list").innerHTML = CARDS.map((c, i) => `
+  <li>
+    <div class="thumb">${faceHTML(i)}</div>
+    <div>
+      <h3><span>${c.num}</span>${c.jp}</h3>
+      <p><b>正位置</b>${c.up.join("・")}</p>
+      <p><b class="rev">逆位置</b>${c.rev.join("・")}</p>
+    </div>
+  </li>`).join("");
+
+/* ===== ホーム画面への追加案内（Webに公開したときだけ表示） ===== */
+(function installHint() {
+  const isPwaBuild = !!document.querySelector('link[rel="manifest"]') && location.protocol.startsWith("http");
+  const standalone = window.matchMedia("(display-mode: standalone)").matches || navigator.standalone === true;
+  let dismissed = false;
+  try { dismissed = localStorage.getItem("install-hint") === "closed"; } catch (e) {}
+  if (isPwaBuild && !standalone && !dismissed) $("install").hidden = false;
+  $("install-close").addEventListener("click", () => {
+    $("install").hidden = true;
+    try { localStorage.setItem("install-hint", "closed"); } catch (e) {}
+  });
+})();
+
+document.documentElement.lang = "ja";
+if (CARD_IMAGES) CARDS.forEach((_, i) => { new Image().src = cardImagePath(i); });
+deal();
+</script>
+<script>
+/* Service Worker の登録（http/https で開いたときだけ。ファイルを直接開いた場合は登録しない） */
+if ("serviceWorker" in navigator && location.protocol.startsWith("http")) {
+  navigator.serviceWorker.register("sw.js").catch(() => {});
+}
+</script>
+</body>
+</html>
